@@ -25,10 +25,13 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./database/mongoDB:/data/db
+      - mongodata:/data/db
     networks:
       - mongo-compose-network
 
 networks: 
     mongo-compose-network:
       driver: bridge
+
+volumes:
+  mongodata:
