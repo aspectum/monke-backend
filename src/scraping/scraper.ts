@@ -45,4 +45,4 @@ const scrape = async (amzUrl: string) => {
     return data;
 };
 
-module.exports = scrape;
+export default scrape;
