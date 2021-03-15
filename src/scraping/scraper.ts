@@ -1,6 +1,8 @@
 import puppeteer from 'puppeteer';
 
-const scrape = async (amzUrl: string) => {
+import { ScrapedData } from '../interfaces';
+
+const scrape = async (amzUrl: string): Promise<ScrapedData> => {
     // Setting up puppeteer
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
