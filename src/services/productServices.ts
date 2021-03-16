@@ -1,6 +1,6 @@
-import { Product } from '../models/productModel';
 import scrape from '../scraping/scraper';
 import scrapedDataParser from '../helpers/scrapedDataParser';
+import { Product } from '../models/productModel';
 import { ProductData } from '../interfaces';
 
 // Defining product services
