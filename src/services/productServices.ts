@@ -17,7 +17,7 @@ export default class ProductServices {
             title,
             imageUrl,
             currency,
-            price_history: [
+            priceHistory: [
                 {
                     price,
                 },
