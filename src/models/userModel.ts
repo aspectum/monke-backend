@@ -26,7 +26,7 @@ const userSchema = new Schema<UserDocument, UserModel>({
     ],
     activated: {
         type: Boolean,
-        required: true,
+        default: false,
     },
 });
 
