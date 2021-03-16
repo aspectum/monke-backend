@@ -64,7 +64,7 @@ export default class UserServices {
             });
     }
 
-    static removeAlert(alertId: ObjectId, userId: ObjectId) {
+    static removeAlert(alertId: ObjectId, userId: string) {
         return User.findById(userId)
             .exec()!
             .then((user) => {
