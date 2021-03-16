@@ -12,3 +12,9 @@ export interface AlertDocument extends Document {
 
 // Interface for mongoose Model
 export interface AlertModel extends Model<AlertDocument> {}
+
+// Alert data interface (input when creating new alert)
+export interface AlertData {
+    url: string;
+    targetPrice: number;
+}
