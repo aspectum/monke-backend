@@ -1,10 +1,10 @@
-import { ScrapedData, ParsedData } from '../interfaces';
+import { RawProductData, ProductData } from '../interfaces';
 
 interface AmazonLocaleTable {
     [key: string]: string[];
 }
 
-const scrapedDataParser = (scrapedData: ScrapedData): ParsedData => {
+const scrapedDataParser = (scrapedData: RawProductData): ProductData => {
     const re = /[0-9]+[.,]+[0-9]+/;
     // url_code: [Country, URL, ISO currency code, currency symbol]
     const amzCountries: AmazonLocaleTable = {

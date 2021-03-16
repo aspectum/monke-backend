@@ -1,8 +1,8 @@
 import puppeteer from 'puppeteer';
 
-import { ScrapedData } from '../interfaces';
+import { RawProductData } from '../interfaces';
 
-const scrape = async (amzUrl: string): Promise<ScrapedData> => {
+const scrape = async (amzUrl: string): Promise<RawProductData> => {
     // Setting up puppeteer
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -10,7 +10,7 @@ const scrape = async (amzUrl: string): Promise<ScrapedData> => {
 
     // Disabling images, css and custom fonts
     await page.setRequestInterception(true);
-    page.on('request', req => {
+    page.on('request', (req) => {
         if (
             req.resourceType() === 'stylesheet' ||
             req.resourceType() === 'font' ||
