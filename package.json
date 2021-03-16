@@ -2,10 +2,10 @@
   "name": "monke-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsnd --clear --respawn --transpile-only -r dotenv/config src/index.ts",
+    "dev": "tsnd --clear --respawn --transpile-only -r dotenv/config src/server.ts",
     "docker-start": "docker-compose up -d",
     "docker-stop": "docker-compose down"
   },
