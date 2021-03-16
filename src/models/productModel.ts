@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
 
-import { ProductDocument } from '../interfaces';
+import { ProductDocument, ProductModel } from '../interfaces';
 
 // Defining the model for the products
-const productSchema = new Schema<ProductDocument>({
+const productSchema = new Schema<ProductDocument, ProductModel>({
     _id: {
         type: String,
     },
@@ -38,4 +38,4 @@ const productSchema = new Schema<ProductDocument>({
     ],
 });
 
-export default model('Product', productSchema);
+export const Product = model<ProductDocument, ProductModel>('Product', productSchema);

@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose';
 
-import { UserDocument } from '../interfaces';
+import { UserDocument, UserModel } from '../interfaces';
 
 // maybe will need model interfaces later: https://stackoverflow.com/a/45675548, https://stackoverflow.com/a/64616614
 // Defining the model for the users
-const userSchema = new Schema<UserDocument>({
+const userSchema = new Schema<UserDocument, UserModel>({
     username: {
         type: String,
         required: true,
@@ -48,4 +48,4 @@ userSchema.methods.removeAlert = function (alertId) {
 
 // TODO: Edit alerts, or not
 
-export default model('User', userSchema);
+export const User = model<UserDocument, UserModel>('User', userSchema);

@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
 
-import { AlertDocument } from '../interfaces';
+import { AlertDocument, AlertModel } from '../interfaces';
 
 // Defining the model for the alerts
-const alertSchema = new Schema<AlertDocument>(
+const alertSchema = new Schema<AlertDocument, AlertModel>(
     {
         ASIN: {
             type: String,
@@ -18,4 +18,4 @@ const alertSchema = new Schema<AlertDocument>(
     { timestamps: true }
 );
 
-export default model('Alert', alertSchema);
+export const Alert = model<AlertDocument, AlertModel>('Alert', alertSchema);
