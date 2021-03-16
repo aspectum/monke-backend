@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 import { UserDocument, UserModel } from '../interfaces';
 
-// maybe will need model interfaces later: https://stackoverflow.com/a/45675548, https://stackoverflow.com/a/64616614
+// maybe will need model interfaces later: https://stackoverflow.com/a/45675548, https://stackoverflow.com/a/64616614, https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
 // Defining the model for the users
 const userSchema = new Schema<UserDocument, UserModel>({
     username: {
