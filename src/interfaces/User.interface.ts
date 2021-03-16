@@ -1,17 +1,25 @@
-import { Document, Schema, Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { AlertModel } from './Alert.interface';
+import { ObjectId } from '../types';
 
 // Interface for mongoose Document
 export interface UserDocument extends Document {
-    _id: Schema.Types.ObjectId;
+    _id: ObjectId;
     username: string;
     email: string;
     encryptedPassword: string;
-    alerts: Array<Schema.Types.ObjectId | AlertModel>; // if populated
+    alerts: Array<ObjectId | AlertModel>; // if populated
     activated: boolean;
-    addAlert(): UserDocument;
-    removeAlert(): UserDocument;
+    addAlert(alertId: ObjectId): Promise<UserDocument>;
+    removeAlert(alertId: ObjectId): Promise<UserDocument>;
 }
 
 // Interface for mongoose Model
 export interface UserModel extends Model<UserDocument> {}
+
+// User data interface
+export interface UserData {
+    username: string;
+    email: string;
+    password: string;
+}
