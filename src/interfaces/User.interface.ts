@@ -17,7 +17,7 @@ export interface UserDocument extends Document {
 // Interface for mongoose Model
 export interface UserModel extends Model<UserDocument> {}
 
-// User data interface
+// User data interface (input when signing up)
 export interface UserData {
     username: string;
     email: string;
