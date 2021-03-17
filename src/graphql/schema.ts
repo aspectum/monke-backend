@@ -34,6 +34,8 @@ export default buildSchema(`
 
     type RootMutation {
         createAlert(alertData: AlertData!): Alert!
+        editAlert(id: ID!, newPrice: Float): Alert!
+        deleteAlert(id: ID!): Alert!
     }
 
     schema {

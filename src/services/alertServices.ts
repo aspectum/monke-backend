@@ -55,29 +55,56 @@ export default class AlertServices {
             .then((populatedUser) => populatedUser.alerts);
     }
 
-    static findById(alertId: string) {
+    static findById(alertId: string, userId: string) {
         return Alert.findById(alertId).then((alert) => {
-            return alert!.populate('product').execPopulate();
+            if (alert) {
+                if (alert.user.equals(userId)) {
+                    return alert.populate('product').execPopulate();
+                }
+                throw new Error('This alert does not belong to this user');
+            }
+            throw new Error('There is no such alert');
         });
     }
 
-    // TODO: populate
-    static editAlert(alertId: string, targetPrice: number) {
-        return Alert.findByIdAndUpdate(alertId, { targetPrice }, { new: true });
+    static editAlert(alertId: string, targetPrice: number, userId: string) {
+        return Alert.findById(alertId)
+            .then((alert) => {
+                if (alert) {
+                    if (alert.user.equals(userId)) {
+                        return alert;
+                    }
+                    throw new Error('This alert does not belong to this user');
+                }
+                throw new Error('There is no such alert');
+            })
+            .then((alert) => {
+                alert.targetPrice = targetPrice;
+                return alert.save();
+            })
+            .then((alert) => alert.populate('product').execPopulate());
     }
 
-    // TODO: populate
     static deleteAlert(alertId: string, userId: string) {
         let deletedAlert: AlertDocument;
 
-        return Alert.findByIdAndDelete(alertId)
-            .then((deleted) => {
-                if (!deleted) {
-                    throw new Error('ERROR: no such alert');
+        return Alert.findById(alertId)
+            .then((alert) => {
+                if (alert) {
+                    if (alert.user.equals(userId)) {
+                        return alert;
+                    }
+                    throw new Error('This alert does not belong to this user');
                 }
-                deletedAlert = deleted!;
+                throw new Error('There is no such alert');
+            })
+            .then((alert) => {
+                return alert.deleteOne();
+            })
+            .then((alert) => {
+                deletedAlert = alert;
                 return UserServices.removeAlert(deletedAlert._id, userId);
             })
-            .then(() => deletedAlert);
+            .then(() => deletedAlert.populate('product').execPopulate());
     }
 }
