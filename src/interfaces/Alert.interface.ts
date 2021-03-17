@@ -1,12 +1,13 @@
-import { Document, Schema, Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { ProductModel } from './Product.interface';
+import { ObjectId } from '../types';
 
 // Interface for mongoose Document
 export interface AlertDocument extends Document {
-    _id: Schema.Types.ObjectId;
+    _id: ObjectId;
     product: string | ProductModel; // if populated
     targetPrice: number;
-    user: Schema.Types.ObjectId;
+    user: ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
