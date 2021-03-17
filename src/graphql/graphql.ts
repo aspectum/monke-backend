@@ -6,5 +6,4 @@ import * as resolvers from './resolvers';
 export default graphqlHTTP({
     schema,
     rootValue: resolvers,
-    graphiql: process.env.NODE_ENV === 'development',
 });
