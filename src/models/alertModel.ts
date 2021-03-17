@@ -5,7 +5,7 @@ import { AlertDocument, AlertModel } from '../interfaces';
 // Defining the model for the alerts
 const alertSchema = new Schema<AlertDocument, AlertModel>(
     {
-        ASIN: {
+        product: {
             type: String,
             required: true,
             ref: 'Product',

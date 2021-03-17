@@ -27,7 +27,7 @@ export default class AlertServices {
             })
             .then((product) => {
                 const newAlert = new Alert({
-                    ASIN: product._id,
+                    product: product._id,
                     targetPrice,
                 });
 
@@ -37,7 +37,7 @@ export default class AlertServices {
                 createdAlert = alert;
                 return UserServices.addAlert(alert._id, userId);
             })
-            .then(() => createdAlert); // Check if added correctly?
+            .then(() => createdAlert.populate('product').execPopulate()); // Check if added correctly?
     }
 
     static listUserAlerts(userId: string) {
@@ -46,7 +46,7 @@ export default class AlertServices {
                 return user!
                     .populate({
                         path: 'alerts',
-                        populate: { path: 'ASIN' },
+                        populate: { path: 'product' },
                     })
                     .execPopulate();
             })
@@ -55,14 +55,16 @@ export default class AlertServices {
 
     static findById(alertId: string) {
         return Alert.findById(alertId).then((alert) => {
-            return alert!.populate('ASIN').execPopulate();
+            return alert!.populate('product').execPopulate();
         });
     }
 
+    // TODO: populate
     static editAlert(alertId: string, targetPrice: number) {
         return Alert.findByIdAndUpdate(alertId, { targetPrice }, { new: true });
     }
 
+    // TODO: populate
     static deleteAlert(alertId: string, userId: string) {
         let deletedAlert: AlertDocument;
 

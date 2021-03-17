@@ -4,7 +4,7 @@ import { ProductModel } from './Product.interface';
 // Interface for mongoose Document
 export interface AlertDocument extends Document {
     _id: Schema.Types.ObjectId;
-    ASIN: string | ProductModel; // if populated
+    product: string | ProductModel; // if populated
     targetPrice: number;
     createdAt: Date;
     updatedAt: Date;
