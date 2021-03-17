@@ -14,6 +14,11 @@ const alertSchema = new Schema<AlertDocument, AlertModel>(
             type: Number,
             required: true,
         },
+        user: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'User',
+        },
     },
     { timestamps: true }
 );

@@ -1,7 +1,8 @@
-import { Alert } from '../models/alertModel';
-import UserServices from './userServices';
-import ProductServices from './productServices';
+import { Types } from 'mongoose';
 import { AlertData, AlertDocument, ProductData } from '../interfaces';
+import { Alert } from '../models/alertModel';
+import ProductServices from './productServices';
+import UserServices from './userServices';
 
 // Defining alert services
 export default class AlertServices {
@@ -29,6 +30,7 @@ export default class AlertServices {
                 const newAlert = new Alert({
                     product: product._id,
                     targetPrice,
+                    user: Types.ObjectId(userId),
                 });
 
                 return newAlert.save();

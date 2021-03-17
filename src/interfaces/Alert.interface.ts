@@ -6,6 +6,7 @@ export interface AlertDocument extends Document {
     _id: Schema.Types.ObjectId;
     product: string | ProductModel; // if populated
     targetPrice: number;
+    user: Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
