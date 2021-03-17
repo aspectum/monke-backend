@@ -2,7 +2,6 @@ import { Alert } from '../models/alertModel';
 import UserServices from './userServices';
 import ProductServices from './productServices';
 import { AlertData, AlertDocument, ProductData } from '../interfaces';
-import stringToObjectId from '../helpers/stringToObjectId';
 
 // Defining alert services
 export default class AlertServices {
@@ -36,8 +35,7 @@ export default class AlertServices {
             })
             .then((alert) => {
                 createdAlert = alert;
-                const alertId = stringToObjectId(alert._id.toString());
-                return UserServices.addAlert(alertId, userId);
+                return UserServices.addAlert(alert._id, userId);
             })
             .then(() => createdAlert); // Check if added correctly?
     }
@@ -74,7 +72,7 @@ export default class AlertServices {
                     throw new Error('ERROR: no such alert');
                 }
                 deletedAlert = deleted!;
-                return UserServices.removeAlert(stringToObjectId(alertId), userId);
+                return UserServices.removeAlert(deletedAlert._id, userId);
             })
             .then(() => deletedAlert);
     }
