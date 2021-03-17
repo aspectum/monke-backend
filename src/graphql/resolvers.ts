@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import AlertServices from '../services/alertServices';
 
 export const getAlerts = async (args, req) => {
@@ -21,11 +22,10 @@ export const getSingleAlert = async (args, req) => {
 };
 
 export const createAlert = async (args, req) => {
-    console.log('hello');
     const userId = req.authData.id;
     const { url, targetPrice } = args.alertData;
 
     const alert = await AlertServices.createAlert({ url, targetPrice }, userId);
-    console.log(alert);
+    console.log(`User ${chalk.blue(userId)} created alert for ${chalk.green(alert.product.title)}`);
     return alert;
 };

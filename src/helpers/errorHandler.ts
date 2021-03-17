@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
 // TODO: better error handling
@@ -6,7 +7,8 @@ import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
 const errorParser = (err: Error) => {
     console.log('---------NEW ERROR----------');
-    console.log(err);
+    console.log(chalk.bgRed(err.message));
+    console.log(chalk.bgRed(err.stack));
     console.log(Object.getOwnPropertyNames(err));
     return err.message;
 };
