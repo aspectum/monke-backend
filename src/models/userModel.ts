@@ -9,10 +9,12 @@ const userSchema = new Schema<UserDocument, UserModel>({
     username: {
         type: String,
         required: true,
+        unique: true,
     },
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     encryptedPassword: {
         type: String,
