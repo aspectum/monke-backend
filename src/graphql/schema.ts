@@ -25,6 +25,7 @@ export default buildSchema(`
 
     type RootQuery {
         getAlerts: [Alert]!
+        getSingleAlert(id: ID!): Alert
     } 
 
     schema {
