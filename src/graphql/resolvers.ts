@@ -19,3 +19,13 @@ export const getSingleAlert = async (args, req) => {
 
     return alert;
 };
+
+export const createAlert = async (args, req) => {
+    console.log('hello');
+    const userId = req.authData.id;
+    const { url, targetPrice } = args.alertData;
+
+    const alert = await AlertServices.createAlert({ url, targetPrice }, userId);
+    console.log(alert);
+    return alert;
+};

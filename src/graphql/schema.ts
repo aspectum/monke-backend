@@ -1,6 +1,11 @@
 import { buildSchema } from 'graphql';
 
 export default buildSchema(`
+    input AlertData {
+        url: String
+        targetPrice: Float
+    }
+
     type Price {
         price: Float
         date: String
@@ -16,19 +21,23 @@ export default buildSchema(`
 
     type Alert {
         id: ID!
-        ASIN: String
         targetPrice: Float
         updatedAt: String
         createdAt: String
-        productDetails: Product
+        product: Product
     }
 
     type RootQuery {
         getAlerts: [Alert]!
         getSingleAlert(id: ID!): Alert
-    } 
+    }
+
+    type RootMutation {
+        createAlert(alertData: AlertData!): Alert!
+    }
 
     schema {
         query: RootQuery
+        mutation: RootMutation
     }
 `);
