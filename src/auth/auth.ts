@@ -18,10 +18,7 @@ export const login = (req: ExpressReq, res: ExpressRes, next: ExpressNext): void
         .then((token) => {
             return res.status(200).send({ token }); // TODO: better message
         })
-        .catch((err) => {
-            console.log(err);
-            return res.status(500).send(); // TODO: next(err)
-        });
+        .catch(next);
 };
 
 export const register = (req: ExpressReq, res: ExpressRes, next: ExpressNext): void => {
@@ -30,13 +27,7 @@ export const register = (req: ExpressReq, res: ExpressRes, next: ExpressNext): v
         .then((user) => {
             return res.status(201).send(user);
         })
-        .catch((err) => {
-            // TODO: better error handling
-            // Example
-            // if (err.name === 'MongoError' && err.code === 1000 && Object.keys(err.keyPattern).includes('email')) customError.msg(email already exists)
-            console.log(err);
-            return res.status(500).send();
-        });
+        .catch(next);
 };
 
 export const checkToken = (req: ExpressReq, res: ExpressRes, next: ExpressNext): ExpressRes => {

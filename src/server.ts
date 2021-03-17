@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dbConfig from './config/db';
 import graphql from './graphql/graphql';
 import auth, { authMiddleware } from './auth';
+import { errorMiddleware } from './helpers/errorHandler';
 
 const PORT = process.env.PORT || 5000;
 
@@ -12,6 +13,8 @@ const app = express();
 app.use(express.json());
 app.use('/auth', auth);
 app.use(authMiddleware);
+
+app.use(errorMiddleware);
 
 app.use('/graphql', graphql);
 
