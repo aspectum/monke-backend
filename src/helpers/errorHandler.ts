@@ -1,33 +1,58 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
 import { GraphQLError } from 'graphql';
+import { MongoError } from 'mongodb';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
-// TODO: better error handling
-// Example
-// if (err.name === 'MongoError' && err.code === 1000 && Object.keys(err.keyPattern).includes('email')) customError.msg(email already exists)
+interface CustomMongoError extends MongoError {
+    code: number;
+    keyValue: {
+        email?: string;
+        username?: string;
+    };
+}
 
-const errorParser = (err: Error | GraphQLError) => {
+type PossibleErrors = Error | GraphQLError | CustomMongoError;
+
+type ErrorResponseObject = {
+    name: string;
+    message: string;
+};
+
+const errorLogger = (error: ErrorResponseObject, stack?: string) => {
     console.log('---------NEW ERROR----------');
-    console.log(chalk.bgRed(err.name));
-    console.log(chalk.bgRed(err.message));
-    console.log(chalk.bgRed(err.stack));
-    console.log(Object.getOwnPropertyNames(err));
+    console.log(chalk.bgRed(error.name));
+    console.log(chalk.bgRed(error.message));
+    console.log(chalk.bgRed(stack));
+    // console.log(Object.getOwnPropertyNames(error));
+};
 
-    let name: string;
-
-    // const t = typeof err
-
-    if ('originalError' in err) {
-        name = err.originalError!.name;
-    } else {
-        name = err.name;
-    }
-
-    return {
-        name,
+const errorParser = (err: PossibleErrors) => {
+    const error: ErrorResponseObject = {
+        name: err.name,
         message: err.message,
     };
+
+    // If error was throw by graphql
+    if ('originalError' in err && err.originalError) {
+        error.name = err.originalError.name;
+    }
+    // If error was thrown by mongoDB
+    else if (err.name === 'MongoError' && 'code' in err) {
+        if (err.code === 11000) {
+            if (Object.keys(err.keyValue).includes('email')) {
+                error.name = 'EmailAlreadyExists';
+                error.message = `There is already a user with the email ${err.keyValue.email}`;
+            }
+            if (Object.keys(err.keyValue).includes('username')) {
+                error.name = 'UsernameAlreadyExists';
+                error.message = `There is already a user with the username ${err.keyValue.username}`;
+            }
+        }
+    }
+
+    errorLogger(error, err.stack);
+    return error;
 };
 
 export const errorMiddleware = (
