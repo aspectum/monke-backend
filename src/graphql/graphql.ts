@@ -3,7 +3,6 @@ import schema from './schema';
 import * as resolvers from './resolvers';
 import { formatError } from '../helpers/errorHandler';
 
-// TODO: format error
 export default graphqlHTTP({
     schema,
     rootValue: resolvers,

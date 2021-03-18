@@ -33,17 +33,16 @@ const userSchema = new Schema<UserDocument, UserModel>({
     },
 });
 
-// TODO: define type of alertId
 // Defining method to add a new alert to array
 userSchema.methods.addAlert = function (alertId: ObjectId) {
-    this.alerts.push(alertId);
+    (this.alerts as ObjectId[]).push(alertId);
 
     return this.save();
 };
 
 // Defining method to remove an alert from array
 userSchema.methods.removeAlert = function (alertId: ObjectId) {
-    const index = this.alerts.indexOf(alertId);
+    const index = (this.alerts as ObjectId[]).indexOf(alertId);
     this.alerts.splice(index, 1);
 
     return this.save();
