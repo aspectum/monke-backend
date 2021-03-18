@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import { User } from '../models/userModel';
-import { RegisterData } from '../interfaces';
+import { RegisterData, UserDocument } from '../interfaces';
 import { ObjectId } from '../types';
 
 const saltRounds = 12;
@@ -32,16 +32,16 @@ export default class UserServices {
     }
 
     // login handler
-    static checkCredentials(credentials: Credentials): Promise<ObjectId> {
+    static checkCredentials(credentials: Credentials): Promise<UserDocument> {
         const { email, password } = credentials;
-        let userId: ObjectId;
+        let foundUser: UserDocument;
 
         return User.find({ email })
             .exec()
             .then((users) => {
                 const user = users[0];
                 if (user) {
-                    userId = user._id;
+                    foundUser = user;
 
                     return bcrypt.compare(password, user.encryptedPassword);
                 }
@@ -49,7 +49,7 @@ export default class UserServices {
             })
             .then((isValid) => {
                 if (isValid) {
-                    return userId;
+                    return foundUser;
                 }
                 throw new Error('ERROR: wrong password'); // TODO: fix errors
             });

@@ -8,6 +8,7 @@ export interface ObjectId extends Schema.Types.ObjectId, Types.ObjectId {}
 export type TokenData = {
     id: string;
     username: string;
+    email: string;
 };
 
 export interface ExpressReq extends Request {
