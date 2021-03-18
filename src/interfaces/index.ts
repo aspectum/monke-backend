@@ -1,3 +1,3 @@
-export * from './Product.interface';
-export * from './User.interface';
-export * from './Alert.interface';
+export * from './product.interface';
+export * from './user.interface';
+export * from './alert.interface';

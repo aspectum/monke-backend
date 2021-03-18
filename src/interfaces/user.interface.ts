@@ -1,5 +1,5 @@
 import { Document, Model } from 'mongoose';
-import { AlertModel } from './Alert.interface';
+import { AlertModel } from './alert.interface';
 import { ObjectId } from '../types';
 
 // Interface for mongoose Document

@@ -1,5 +1,5 @@
 import { Document, Model } from 'mongoose';
-import { ProductModel } from './Product.interface';
+import { ProductModel } from './product.interface';
 import { ObjectId } from '../types';
 
 // Interface for mongoose Document
