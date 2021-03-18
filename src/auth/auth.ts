@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-
+import { NoAuthorizationHeaderError } from '../helpers/customErrors';
 import UserServices from '../services/userServices';
 import { ExpressNext, ExpressReq, ExpressRes, TokenData } from '../types';
 
@@ -35,12 +35,12 @@ export const authMiddleware = (req: ExpressReq, res: ExpressRes, next: ExpressNe
     const { authorization } = req.headers;
 
     if (!authorization) {
-        return next(new Error('ERROR: no authorization header')); // TODO: improve error passing
+        return next(new NoAuthorizationHeaderError());
     }
 
     const token = authorization.split(' ')[1]; // Extracting token from 'Bearer XXXXX'
 
-    const tokenData = jwt.verify(token, secret) as TokenData; // Will throw error if fails // TODO: check error name in error middleware https://www.npmjs.com/package/jsonwebtoken#errors--codes
+    const tokenData = jwt.verify(token, secret) as TokenData; // Will throw error if fails https://www.npmjs.com/package/jsonwebtoken#errors--codes
 
     req.authData = tokenData;
 

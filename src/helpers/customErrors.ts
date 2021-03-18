@@ -1,9 +1,5 @@
 import { RawProductData } from '../interfaces';
 
-// TODO
-// JWT errors
-// Mongoose errors
-
 class CustomError extends Error {
     customError;
 
@@ -72,5 +68,12 @@ export class ProductValidationError extends CustomError {
         super(`Could not validate product`);
         this.name = 'ProductValidationError';
         this.scrapedData = scrapedData;
+    }
+}
+
+export class NoAuthorizationHeaderError extends CustomError {
+    constructor() {
+        super(`No authorization header`);
+        this.name = 'NoAuthorizationHeaderError';
     }
 }
