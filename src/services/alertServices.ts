@@ -4,11 +4,13 @@ import { Alert } from '../models/alertModel';
 import ProductServices from './productServices';
 import UserServices from './userServices';
 import { Populated } from '../types';
+import { alertFormatter } from '../helpers/doc2ResObj';
 
-type PromisePopulatedAlert = Promise<Populated<AlertDocument, 'product'>>;
+type PopulatedAlert = Populated<AlertDocument, 'product'>;
 
 // Defining alert services
 export default class AlertServices {
+    // Scrapes page given by client, creates product if it doesn't exist, create the alert and add it to user
     static createAlert(alertData: AlertData, userId: string) {
         const { url, targetPrice } = alertData;
         let productData: ProductData;
@@ -41,13 +43,14 @@ export default class AlertServices {
             .then((alert) => {
                 createdAlert = alert;
                 return UserServices.addAlert(alert._id, userId);
-            }) // Check if added correctly?
+            }) // TODO: Check if added correctly?
             .then(() => {
-                return createdAlert.populate('product').execPopulate() as PromisePopulatedAlert;
+                return createdAlert.populate('product').execPopulate() as Promise<PopulatedAlert>;
             })
-            .then((populatedAlert) => populatedAlert); // Check if added correctly?
+            .then(alertFormatter);
     }
 
+    // Finds user and return their alerts
     static listUserAlerts(userId: string) {
         return UserServices.findById(userId)
             .then((user) => {
@@ -58,21 +61,26 @@ export default class AlertServices {
                     })
                     .execPopulate() as Promise<Populated<UserDocument, 'alerts'>>;
             })
-            .then((populatedUser) => populatedUser.alerts);
+            .then((populatedUser) => populatedUser.alerts as PopulatedAlert[])
+            .then((populatedAlerts) => populatedAlerts.map(alertFormatter));
     }
 
+    // Finds an alert by it's id
     static findById(alertId: string, userId: string) {
-        return Alert.findById(alertId).then((alert) => {
-            if (alert) {
-                if (alert.user.equals(userId)) {
-                    return alert.populate('product').execPopulate() as PromisePopulatedAlert;
+        return Alert.findById(alertId)
+            .then((alert) => {
+                if (alert) {
+                    if (alert.user.equals(userId)) {
+                        return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+                    }
+                    throw new Error('This alert does not belong to this user');
                 }
-                throw new Error('This alert does not belong to this user');
-            }
-            throw new Error('There is no such alert');
-        });
+                throw new Error('There is no such alert');
+            })
+            .then(alertFormatter);
     }
 
+    // Edits an alert
     static editAlert(alertId: string, targetPrice: number, userId: string) {
         return Alert.findById(alertId)
             .then((alert) => {
@@ -89,10 +97,12 @@ export default class AlertServices {
                 return alert.save();
             })
             .then((alert) => {
-                return alert.populate('product').execPopulate() as PromisePopulatedAlert;
-            });
+                return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+            })
+            .then(alertFormatter);
     }
 
+    // Deletes an alert
     static deleteAlert(alertId: string, userId: string) {
         let deletedAlert: AlertDocument;
 
@@ -114,7 +124,8 @@ export default class AlertServices {
                 return UserServices.removeAlert(deletedAlert._id, userId);
             })
             .then(() => {
-                return deletedAlert.populate('product').execPopulate() as PromisePopulatedAlert;
-            });
+                return deletedAlert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+            })
+            .then(alertFormatter);
     }
 }

@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt';
 
 import { User } from '../models/userModel';
-import { RegisterData, UserDocument } from '../interfaces';
+import { RegisterData, UserDocument, UserObject } from '../interfaces';
 import { ObjectId } from '../types';
+import { userFormatter } from '../helpers/doc2ResObj';
 
 const saltRounds = 12;
 
@@ -13,26 +14,31 @@ type Credentials = {
 
 // Defining user services
 export default class UserServices {
+    // Creating a new user
     static createUser(userData: RegisterData) {
         const { username, email, password } = userData;
-        return bcrypt.hash(password, saltRounds).then((encryptedPassword) => {
-            const newUser = new User({
-                username,
-                email,
-                encryptedPassword,
-                alerts: [],
-            });
+        return bcrypt
+            .hash(password, saltRounds)
+            .then((encryptedPassword) => {
+                const newUser = new User({
+                    username,
+                    email,
+                    encryptedPassword,
+                    alerts: [],
+                });
 
-            return newUser.save();
-        });
+                return newUser.save();
+            })
+            .then(userFormatter);
     }
 
+    // Finding user by id (used by AlertServices and so doesn't need userFormatter)
     static findById(userId: string) {
         return User.findById(userId).exec();
     }
 
-    // login handler
-    static checkCredentials(credentials: Credentials): Promise<UserDocument> {
+    // Login handler
+    static checkCredentials(credentials: Credentials): Promise<UserObject> {
         const { email, password } = credentials;
         let foundUser: UserDocument;
 
@@ -52,10 +58,11 @@ export default class UserServices {
                     return foundUser;
                 }
                 throw new Error('ERROR: wrong password'); // TODO: fix errors
-            });
+            })
+            .then(userFormatter);
     }
 
-    // add alert to user
+    // Add alert to user (used by AlertServices and so doesn't need userFormatter)
     static addAlert(alertId: ObjectId, userId: string) {
         return User.findById(userId)
             .exec()!
@@ -64,6 +71,7 @@ export default class UserServices {
             });
     }
 
+    // Remove alert from user (used by AlertServices and so doesn't need userFormatter)
     static removeAlert(alertId: ObjectId, userId: string) {
         return User.findById(userId)
             .exec()!
