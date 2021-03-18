@@ -12,6 +12,7 @@ export default buildSchema(`
     }
 
     type Product {
+        ASIN: String
         url: String
         title: String
         imageUrl: String

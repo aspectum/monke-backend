@@ -2,11 +2,22 @@ import { Document, Model } from 'mongoose';
 import { AlertModel } from './alert.interface';
 import { ObjectId } from '../types';
 
-// Interface for mongoose Document
-export interface UserDocument extends Document {
-    _id: ObjectId;
+// What is sent by API
+export interface UserObject {
+    id: string;
     username: string;
     email: string;
+}
+
+// User data interface (input when signing up)
+export interface RegisterData extends Omit<UserObject, 'id'> {
+    password: string;
+}
+
+// --------------- MONGOOSE INTERFACES --------------- //
+// Interface for mongoose Document
+export interface UserDocument extends Omit<UserObject, 'id'>, Document {
+    _id: ObjectId;
     encryptedPassword: string;
     alerts: Array<ObjectId | AlertModel>; // if populated
     activated: boolean;
@@ -16,10 +27,3 @@ export interface UserDocument extends Document {
 
 // Interface for mongoose Model
 export interface UserModel extends Model<UserDocument> {}
-
-// User data interface (input when signing up)
-export interface UserData {
-    username: string;
-    email: string;
-    password: string;
-}

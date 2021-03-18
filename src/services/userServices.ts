@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import { User } from '../models/userModel';
-import { UserData } from '../interfaces';
+import { RegisterData } from '../interfaces';
 import { ObjectId } from '../types';
 
 const saltRounds = 12;
@@ -13,7 +13,7 @@ type Credentials = {
 
 // Defining user services
 export default class UserServices {
-    static createUser(userData: UserData) {
+    static createUser(userData: RegisterData) {
         const { username, email, password } = userData;
         return bcrypt.hash(password, saltRounds).then((encryptedPassword) => {
             const newUser = new User({

@@ -1,22 +1,30 @@
 import { Document, Model } from 'mongoose';
 
-// Interface for mongoose Document
-export interface ProductDocument extends Document {
-    _id: string;
+interface Price {
+    price: number;
+    date: Date;
+}
+
+// What is sent by API
+export interface ProductObject {
+    ASIN: string;
     url: string;
     title: string;
     imageUrl: string;
     currency: string;
-    priceHistory: Array<{
-        price: number;
-        date: Date;
-    }>;
+    priceHistory: Array<Price>;
+}
+
+// --------------- MONGOOSE INTERFACES --------------- //
+// Interface for mongoose Document
+export interface ProductDocument extends Omit<ProductObject, 'ASIN'>, Document {
+    _id: string;
 }
 
 // Interface for mongoose Model
 export interface ProductModel extends Model<ProductDocument> {}
 
-// Product data interfaces
+// ------------ PRODUCT DATA INTERFACES ------------ //
 // After scraping, before parsing
 export interface RawProductData {
     ASIN: string;
@@ -27,11 +35,7 @@ export interface RawProductData {
 }
 
 // After parsing
-export interface ProductData {
-    ASIN: string;
-    url: string;
-    title: string;
-    imageUrl: string;
+export interface ProductData extends Omit<RawProductData, 'price'> {
     price: number;
     currency: string;
     error?: Error;
