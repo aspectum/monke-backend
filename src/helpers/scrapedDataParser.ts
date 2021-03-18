@@ -1,4 +1,5 @@
 import { RawProductData, ProductData } from '../interfaces';
+import { ProductValidationError } from './customErrors';
 
 interface AmazonLocaleTable {
     [key: string]: string[];
@@ -44,14 +45,8 @@ const scrapedDataParser = (scrapedData: RawProductData): ProductData => {
         };
     } catch (err) {
         // If something goes wrong (e.g. price text doesn't match RE
-        console.log(err);
 
-        return {
-            ...scrapedData,
-            price: 0, // forcing number
-            currency: '', // forcing value
-            error: err as Error,
-        };
+        throw new ProductValidationError(scrapedData);
     }
 };
 

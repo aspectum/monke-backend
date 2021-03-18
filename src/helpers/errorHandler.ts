@@ -7,10 +7,15 @@ import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
 const errorParser = (err: Error) => {
     console.log('---------NEW ERROR----------');
+    console.log(chalk.bgRed(err.name));
     console.log(chalk.bgRed(err.message));
     console.log(chalk.bgRed(err.stack));
     console.log(Object.getOwnPropertyNames(err));
-    return err.message;
+
+    return {
+        name: err.name,
+        message: err.message,
+    };
 };
 
 export const errorMiddleware = (
@@ -19,9 +24,9 @@ export const errorMiddleware = (
     res: ExpressRes,
     next: ExpressNext
 ) => {
-    return res.status(500).send({ error: errorParser(err) });
+    return res.status(500).send({ errors: [errorParser(err)] });
 };
 
 export const formatError = (err: Error) => {
-    return { message: errorParser(err) };
+    return errorParser(err);
 };

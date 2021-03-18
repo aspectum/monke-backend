@@ -1,12 +1,23 @@
 import { Types } from 'mongoose';
+import { AlertDoesNotExistError, AlertWrongUserError } from '../helpers/customErrors';
+import { alertFormatter } from '../helpers/doc2ResObj';
 import { AlertData, AlertDocument, ProductData, UserDocument } from '../interfaces';
 import { Alert } from '../models/alertModel';
+import { Populated } from '../types';
 import ProductServices from './productServices';
 import UserServices from './userServices';
-import { Populated } from '../types';
-import { alertFormatter } from '../helpers/doc2ResObj';
 
 type PopulatedAlert = Populated<AlertDocument, 'product'>;
+
+const validateAlert = (alert: AlertDocument | null, alertId: string, userId: string) => {
+    if (alert) {
+        if (alert.user.equals(userId)) {
+            return alert; // .populate('product').execPopulate() as Promise<PopulatedAlert>;
+        }
+        throw new AlertWrongUserError(alertId, userId);
+    }
+    throw new AlertDoesNotExistError(alertId);
+};
 
 // Defining alert services
 export default class AlertServices {
@@ -18,7 +29,6 @@ export default class AlertServices {
 
         return ProductServices.scrapeUrl(url)
             .then((data) => {
-                // TODO: Validate if there is an error, maybe change type to remove error if I jus decide to throw it
                 productData = data;
 
                 return ProductServices.findProductByASIN(productData.ASIN);
@@ -68,14 +78,9 @@ export default class AlertServices {
     // Finds an alert by it's id
     static findById(alertId: string, userId: string) {
         return Alert.findById(alertId)
+            .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
-                if (alert) {
-                    if (alert.user.equals(userId)) {
-                        return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
-                    }
-                    throw new Error('This alert does not belong to this user');
-                }
-                throw new Error('There is no such alert');
+                return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
             })
             .then(alertFormatter);
     }
@@ -83,15 +88,7 @@ export default class AlertServices {
     // Edits an alert
     static editAlert(alertId: string, targetPrice: number, userId: string) {
         return Alert.findById(alertId)
-            .then((alert) => {
-                if (alert) {
-                    if (alert.user.equals(userId)) {
-                        return alert;
-                    }
-                    throw new Error('This alert does not belong to this user');
-                }
-                throw new Error('There is no such alert');
-            })
+            .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
                 alert.targetPrice = targetPrice;
                 return alert.save();
@@ -107,15 +104,7 @@ export default class AlertServices {
         let deletedAlert: AlertDocument;
 
         return Alert.findById(alertId)
-            .then((alert) => {
-                if (alert) {
-                    if (alert.user.equals(userId)) {
-                        return alert;
-                    }
-                    throw new Error('This alert does not belong to this user');
-                }
-                throw new Error('There is no such alert');
-            })
+            .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
                 return alert.deleteOne();
             })

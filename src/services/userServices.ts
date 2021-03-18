@@ -4,6 +4,7 @@ import { User } from '../models/userModel';
 import { RegisterData, UserDocument, UserObject } from '../interfaces';
 import { ObjectId } from '../types';
 import { userFormatter } from '../helpers/doc2ResObj';
+import { UserDoesNotExistError, UserWrongCredentialsError } from '../helpers/customErrors';
 
 const saltRounds = 12;
 
@@ -51,13 +52,13 @@ export default class UserServices {
 
                     return bcrypt.compare(password, user.encryptedPassword);
                 }
-                throw new Error('ERROR: user does not exist'); // TODO: fix errors
+                throw new UserDoesNotExistError(email);
             })
             .then((isValid) => {
                 if (isValid) {
                     return foundUser;
                 }
-                throw new Error('ERROR: wrong password'); // TODO: fix errors
+                throw new UserWrongCredentialsError(email);
             })
             .then(userFormatter);
     }

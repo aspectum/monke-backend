@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { ScrapingError } from '../helpers/customErrors';
 
 import { RawProductData } from '../interfaces';
 
@@ -24,27 +25,31 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
 
     await page.goto(amzUrl);
 
-    const data = await page.evaluate(() => {
-        const ASINElement = document.querySelector('input[name^="ASIN"]') as HTMLInputElement;
-        const urlElement = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-        const titleElement = document.querySelector('span#productTitle') as HTMLSpanElement;
-        const imageElement = document.querySelector('img.a-dynamic-image') as HTMLImageElement;
-        // let price = document.querySelector('span.a-color-price').innerText;
-        const priceElement = document.querySelector('.kindle-price span') as HTMLSpanElement; // ebook only, but it's more reliable
+    try {
+        const data = await page.evaluate(() => {
+            const ASINElement = document.querySelector('input[name^="ASIN"]') as HTMLInputElement;
+            const urlElement = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+            const titleElement = document.querySelector('span#productTitle') as HTMLSpanElement;
+            const imageElement = document.querySelector('img.a-dynamic-image') as HTMLImageElement;
+            // let price = document.querySelector('span.a-color-price').innerText;
+            const priceElement = document.querySelector('.kindle-price span') as HTMLSpanElement; // ebook only, but it's more reliable
 
-        return {
-            ASIN: ASINElement.value,
-            url: urlElement.href,
-            title: titleElement.innerText,
-            imageUrl: imageElement.src,
-            price: priceElement.innerText,
-        };
-    });
+            return {
+                ASIN: ASINElement.value,
+                url: urlElement.href,
+                title: titleElement.innerText,
+                imageUrl: imageElement.src,
+                price: priceElement.innerText,
+            };
+        });
 
-    await page.close();
-    await browser.close();
+        await page.close();
+        await browser.close();
 
-    return data;
+        return data;
+    } catch (err) {
+        throw new ScrapingError(amzUrl);
+    }
 };
 
 export default scrape;

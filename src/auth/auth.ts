@@ -10,10 +10,7 @@ export const login = (req: ExpressReq, res: ExpressRes, next: ExpressNext): void
 
     UserServices.checkCredentials({ email, password })
         .then((user) => {
-            if (user) {
-                return jwt.sign(user, secret, { expiresIn: '1h' });
-            }
-            throw new Error('Invalid credentials');
+            return jwt.sign(user, secret, { expiresIn: '1h' });
         })
         .then((token) => {
             return res.status(200).send({ token }); // TODO: better message

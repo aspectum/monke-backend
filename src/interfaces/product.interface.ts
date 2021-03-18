@@ -38,5 +38,4 @@ export interface RawProductData {
 export interface ProductData extends Omit<RawProductData, 'price'> {
     price: number;
     currency: string;
-    error?: Error;
 }
