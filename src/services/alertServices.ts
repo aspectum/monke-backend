@@ -1,8 +1,11 @@
 import { Types } from 'mongoose';
-import { AlertData, AlertDocument, ProductData } from '../interfaces';
+import { AlertData, AlertDocument, ProductData, UserDocument } from '../interfaces';
 import { Alert } from '../models/alertModel';
 import ProductServices from './productServices';
 import UserServices from './userServices';
+import { Populated } from '../types';
+
+type PromisePopulatedAlert = Promise<Populated<AlertDocument, 'product'>>;
 
 // Defining alert services
 export default class AlertServices {
@@ -38,8 +41,11 @@ export default class AlertServices {
             .then((alert) => {
                 createdAlert = alert;
                 return UserServices.addAlert(alert._id, userId);
+            }) // Check if added correctly?
+            .then(() => {
+                return createdAlert.populate('product').execPopulate() as PromisePopulatedAlert;
             })
-            .then(() => createdAlert.populate('product').execPopulate()); // Check if added correctly?
+            .then((populatedAlert) => populatedAlert); // Check if added correctly?
     }
 
     static listUserAlerts(userId: string) {
@@ -50,7 +56,7 @@ export default class AlertServices {
                         path: 'alerts',
                         populate: { path: 'product' },
                     })
-                    .execPopulate();
+                    .execPopulate() as Promise<Populated<UserDocument, 'alerts'>>;
             })
             .then((populatedUser) => populatedUser.alerts);
     }
@@ -59,7 +65,7 @@ export default class AlertServices {
         return Alert.findById(alertId).then((alert) => {
             if (alert) {
                 if (alert.user.equals(userId)) {
-                    return alert.populate('product').execPopulate();
+                    return alert.populate('product').execPopulate() as PromisePopulatedAlert;
                 }
                 throw new Error('This alert does not belong to this user');
             }
@@ -82,7 +88,9 @@ export default class AlertServices {
                 alert.targetPrice = targetPrice;
                 return alert.save();
             })
-            .then((alert) => alert.populate('product').execPopulate());
+            .then((alert) => {
+                return alert.populate('product').execPopulate() as PromisePopulatedAlert;
+            });
     }
 
     static deleteAlert(alertId: string, userId: string) {
@@ -105,6 +113,8 @@ export default class AlertServices {
                 deletedAlert = alert;
                 return UserServices.removeAlert(deletedAlert._id, userId);
             })
-            .then(() => deletedAlert.populate('product').execPopulate());
+            .then(() => {
+                return deletedAlert.populate('product').execPopulate() as PromisePopulatedAlert;
+            });
     }
 }

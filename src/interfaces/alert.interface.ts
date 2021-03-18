@@ -1,5 +1,5 @@
 import { Document, Model } from 'mongoose';
-import { ProductModel, ProductObject } from './product.interface';
+import { ProductDocument, ProductObject } from './product.interface';
 import { ObjectId } from '../types';
 
 // What is sent by API
@@ -15,7 +15,7 @@ export interface AlertObject {
 // Too different to extend AlertObject
 export interface AlertDocument extends Document {
     _id: ObjectId;
-    product: string | ProductModel; // if populated
+    product: string | ProductDocument; // if populated
     targetPrice: number;
     user: ObjectId;
     createdAt: Date;

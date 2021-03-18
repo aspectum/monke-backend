@@ -1,5 +1,5 @@
 import { Document, Model } from 'mongoose';
-import { AlertModel } from './alert.interface';
+import { AlertDocument } from './alert.interface';
 import { ObjectId } from '../types';
 
 // What is sent by API
@@ -19,7 +19,7 @@ export interface RegisterData extends Omit<UserObject, 'id'> {
 export interface UserDocument extends Omit<UserObject, 'id'>, Document {
     _id: ObjectId;
     encryptedPassword: string;
-    alerts: Array<ObjectId | AlertModel>; // if populated
+    alerts: ObjectId[] | AlertDocument[]; // if populated
     activated: boolean;
     addAlert(alertId: ObjectId): Promise<UserDocument>;
     removeAlert(alertId: ObjectId): Promise<UserDocument>;
