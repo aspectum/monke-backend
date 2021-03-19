@@ -5,7 +5,7 @@ import AlertServices from '../services/alertServices';
 // https://stackoverflow.com/questions/49047259/how-to-parse-graphql-request-string-into-an-object
 // import { parse } from 'graphql';
 // console.log(parse(req.body.query).definitions[0].selectionSet.selections[0]);
-export const getAlerts = async (args, req) => {
+export const getAlerts = async (args: any, req: any) => {
     const userId = req.authData.id;
 
     const alerts = await AlertServices.listUserAlerts(userId);
@@ -13,7 +13,7 @@ export const getAlerts = async (args, req) => {
     return alerts;
 };
 
-export const getSingleAlert = async (args, req) => {
+export const getSingleAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
     const alertId = args.id;
 
@@ -22,7 +22,7 @@ export const getSingleAlert = async (args, req) => {
     return alert;
 };
 
-export const createAlert = async (args, req) => {
+export const createAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
     const { url, targetPrice } = args.alertData;
 
@@ -31,7 +31,7 @@ export const createAlert = async (args, req) => {
     return alert;
 };
 
-export const editAlert = async (args, req) => {
+export const editAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
     const alertId = args.id;
     const targetPrice = args.newPrice;
@@ -43,7 +43,7 @@ export const editAlert = async (args, req) => {
     return alert;
 };
 
-export const deleteAlert = async (args, req) => {
+export const deleteAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
     const alertId = args.id;
 
