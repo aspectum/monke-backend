@@ -1,7 +1,7 @@
-import scrape from '../scraping/scraper';
 import scrapedDataParser from '../helpers/scrapedDataParser';
-import { Product } from '../models/productModel';
 import { ProductData } from '../interfaces';
+import { Product } from '../models/productModel';
+import scrape from '../scraping/scraper';
 
 // Defining product services
 export default class ProductServices {
@@ -9,6 +9,7 @@ export default class ProductServices {
         return Product.findById(ASIN).exec();
     }
 
+    // Create product from scraped data (after parsing)
     static createProduct(productData: ProductData) {
         const { ASIN, url, title, imageUrl, currency, price } = productData;
         const newProd = new Product({
@@ -27,10 +28,8 @@ export default class ProductServices {
         return newProd.save();
     }
 
+    // Scraping and parsing url
     static scrapeUrl(url: string) {
-        return scrape(url).then((productData) => {
-            // Processing scraped data
-            return scrapedDataParser(productData);
-        });
+        return scrape(url).then(scrapedDataParser);
     }
 }

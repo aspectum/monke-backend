@@ -1,4 +1,4 @@
-import { RawProductData, ProductData } from '../interfaces';
+import { ProductData, RawProductData } from '../interfaces';
 import { ProductValidationError } from './customErrors';
 
 interface AmazonLocaleTable {
@@ -6,7 +6,7 @@ interface AmazonLocaleTable {
 }
 
 const scrapedDataParser = (scrapedData: RawProductData): ProductData => {
-    const re = /[0-9]+[.,]+[0-9]+/;
+    const re = /[0-9]+[.,]+[0-9]+/; // price string regular expression
     // url_code: [Country, URL, ISO currency code, currency symbol]
     const amzCountries: AmazonLocaleTable = {
         br: ['Brazil', 'amazon.com.br', 'BRL', 'R$'],

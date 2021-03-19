@@ -25,7 +25,7 @@ export interface ProductDocument extends Omit<ProductObject, 'ASIN'>, Document {
 export interface ProductModel extends Model<ProductDocument> {}
 
 // ------------ PRODUCT DATA INTERFACES ------------ //
-// After scraping, before parsing
+// Scraped data, before parsing
 export interface RawProductData {
     ASIN: string;
     url: string;

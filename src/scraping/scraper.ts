@@ -1,8 +1,8 @@
 import puppeteer from 'puppeteer';
 import { ScrapingError } from '../helpers/customErrors';
-
 import { RawProductData } from '../interfaces';
 
+// Scrape amazon page for ebook data
 const scrape = async (amzUrl: string): Promise<RawProductData> => {
     // Setting up puppeteer
     const browser = await puppeteer.launch({ headless: true });

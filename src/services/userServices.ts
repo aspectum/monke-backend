@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
-
-import { User } from '../models/userModel';
-import { RegisterData, UserDocument, UserObject } from '../interfaces';
-import { ObjectId } from '../types';
-import { userFormatter } from '../helpers/doc2ResObj';
 import { UserDoesNotExistError, UserWrongCredentialsError } from '../helpers/customErrors';
+import { userFormatter } from '../helpers/doc2ResObj';
+import { RegisterData, UserDocument, UserObject } from '../interfaces';
+import { User } from '../models/userModel';
+import { ObjectId } from '../types';
 
-const saltRounds = 12;
+const saltRounds = 12; // bcrypt parameter
 
 type Credentials = {
     email: string;

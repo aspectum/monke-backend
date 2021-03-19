@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable @typescript-eslint/lines-between-class-members */
 import { RawProductData } from '../interfaces';
 
 class CustomError extends Error {

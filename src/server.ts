@@ -1,9 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
-
+import auth, { authMiddleware } from './auth';
 import dbConfig from './config/db';
 import graphql from './graphql/graphql';
-import auth, { authMiddleware } from './auth';
 import { errorMiddleware } from './helpers/errorHandler';
 
 const PORT = process.env.PORT || 5000;
@@ -22,7 +21,7 @@ mongoose.connect(dbConfig.uri, dbConfig.options);
 
 const db = mongoose.connection;
 db.on('error', () => {
-    throw new Error('unable to connect to database');
+    throw new Error('Unable to connect to database');
 });
 
 app.listen(PORT, () => {

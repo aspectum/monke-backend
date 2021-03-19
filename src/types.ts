@@ -1,5 +1,5 @@
+import { NextFunction, Request, Response } from 'express';
 import { Schema, Types } from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
 
 // https://stackoverflow.com/questions/42233987/how-to-configure-custom-global-interfaces-d-ts-files-for-typescript
 

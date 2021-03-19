@@ -7,9 +7,7 @@ router.post('/login', login);
 
 router.post('/register', register);
 
-router.use(authMiddleware);
-
-router.get('/', checkToken);
+router.get('/', authMiddleware, checkToken);
 
 export { authMiddleware };
 

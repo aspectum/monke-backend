@@ -1,5 +1,4 @@
-import { Schema, model } from 'mongoose';
-
+import { model, Schema } from 'mongoose';
 import { AlertDocument, AlertModel } from '../interfaces';
 
 // Defining the model for the alerts

@@ -4,6 +4,7 @@ import { GraphQLError } from 'graphql';
 import { MongoError } from 'mongodb';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
+// For some reason keyValue wasn't showing up in default MongoError
 interface CustomMongoError extends MongoError {
     code: number;
     keyValue: {
@@ -19,6 +20,7 @@ type ErrorResponseObject = {
     message: string;
 };
 
+// Console logs the error
 const errorLogger = (error: ErrorResponseObject, stack?: string) => {
     console.log('---------NEW ERROR----------');
     console.log(chalk.bgRed(error.name));
@@ -27,6 +29,7 @@ const errorLogger = (error: ErrorResponseObject, stack?: string) => {
     // console.log(Object.getOwnPropertyNames(error));
 };
 
+// Parses the received error to standardize output format
 const errorParser = (err: PossibleErrors) => {
     const error: ErrorResponseObject = {
         name: err.name,
@@ -55,6 +58,7 @@ const errorParser = (err: PossibleErrors) => {
     return error;
 };
 
+// Express error handling middleware
 export const errorMiddleware = (
     err: Error,
     req: ExpressReq,
@@ -64,6 +68,7 @@ export const errorMiddleware = (
     return res.status(500).send({ errors: [errorParser(err)] });
 };
 
+// express-graphql error formatter function
 export const formatError = (err: Error) => {
     return errorParser(err);
 };

@@ -1,3 +1,4 @@
+// Gettign database config data from environment variables
 export default {
     uri: process.env.MONGO_URI!,
     options: {

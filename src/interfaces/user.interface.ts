@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose';
-import { AlertDocument } from './alert.interface';
 import { ObjectId } from '../types';
+import { AlertDocument } from './alert.interface';
 
 // What is sent by API
 export interface UserObject {

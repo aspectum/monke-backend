@@ -1,5 +1,4 @@
-import { Schema, model } from 'mongoose';
-
+import { model, Schema } from 'mongoose';
 import { ProductDocument, ProductModel } from '../interfaces';
 
 // Defining the model for the products

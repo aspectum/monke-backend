@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose';
-import { ProductDocument, ProductObject } from './product.interface';
 import { ObjectId } from '../types';
+import { ProductDocument, ProductObject } from './product.interface';
 
 // What is sent by API
 export interface AlertObject {
@@ -12,7 +12,7 @@ export interface AlertObject {
 }
 
 // Interface for mongoose Document
-// Too different to extend AlertObject
+// (Too different to extend AlertObject)
 export interface AlertDocument extends Document {
     _id: ObjectId;
     product: string | ProductDocument; // if populated

@@ -9,10 +9,13 @@ import UserServices from './userServices';
 
 type PopulatedAlert = Populated<AlertDocument, 'product'>;
 
+// Checks if alert was found in DB and if so whether it belongs to the user requesting
 const validateAlert = (alert: AlertDocument | null, alertId: string, userId: string) => {
+    // If query returned an alert
     if (alert) {
+        // If alert belongs to requesting user
         if (alert.user.equals(userId)) {
-            return alert; // .populate('product').execPopulate() as Promise<PopulatedAlert>;
+            return alert;
         }
         throw new AlertWrongUserError(alertId, userId);
     }
@@ -35,13 +38,14 @@ export default class AlertServices {
             })
             .then((product) => {
                 // Check if product is already in DB
+                // If not, creates the product
                 if (!product) {
-                    // Maybe this should be something else
                     return ProductServices.createProduct(productData);
                 }
                 return product;
             })
             .then((product) => {
+                // Creating alert
                 const newAlert = new Alert({
                     product: product._id,
                     targetPrice,
@@ -51,6 +55,7 @@ export default class AlertServices {
                 return newAlert.save();
             })
             .then((alert) => {
+                // Saving alert to user document
                 createdAlert = alert;
                 return UserServices.addAlert(alert._id, userId);
             }) // TODO: Check if added correctly?
@@ -104,11 +109,13 @@ export default class AlertServices {
         let deletedAlert: AlertDocument;
 
         return Alert.findById(alertId)
-            .then((alert) => validateAlert(alert, alertId, userId))
+            .then((alert) => validateAlert(alert, alertId, userId)) // Finding alert
             .then((alert) => {
+                // Deleting alert
                 return alert.deleteOne();
             })
             .then((alert) => {
+                // Removing alert from user document
                 deletedAlert = alert;
                 return UserServices.removeAlert(deletedAlert._id, userId);
             })

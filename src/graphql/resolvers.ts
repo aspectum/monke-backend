@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import chalk from 'chalk';
 import AlertServices from '../services/alertServices';
 
@@ -8,6 +9,7 @@ export const getAlerts = async (args, req) => {
     const userId = req.authData.id;
 
     const alerts = await AlertServices.listUserAlerts(userId);
+    console.log(`User ${chalk.blue(userId)} listed alerts`);
     return alerts;
 };
 
@@ -16,7 +18,7 @@ export const getSingleAlert = async (args, req) => {
     const alertId = args.id;
 
     const alert = await AlertServices.findById(alertId, userId);
-
+    console.log(`User ${chalk.blue(userId)} listed alert for ${chalk.green(alert.product.title)}`);
     return alert;
 };
 
