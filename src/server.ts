@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import auth, { authMiddleware } from './auth';
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use('/auth', auth);
 app.use(authMiddleware);
