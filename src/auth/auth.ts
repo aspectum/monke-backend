@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { NoAuthorizationHeaderError } from '../helpers/customErrors';
+import { UserObject } from '../interfaces';
 import UserServices from '../services/userServices';
 import { ExpressNext, ExpressReq, ExpressRes, TokenData } from '../types';
 
@@ -8,13 +9,15 @@ const secret = process.env.JWT_SECRET!; // JWT secret
 // Login express controller
 export const login = (req: ExpressReq, res: ExpressRes, next: ExpressNext): void => {
     const { email, password } = req.body;
+    let userData: UserObject;
 
     UserServices.checkCredentials({ email, password })
         .then((user) => {
+            userData = user;
             return jwt.sign(user, secret, { expiresIn: '1h', noTimestamp: true });
         })
         .then((token) => {
-            return res.status(200).send({ token });
+            return res.status(200).send({ ...userData, token });
         })
         .catch(next); // Forwarding any errors to error middleware
 };
