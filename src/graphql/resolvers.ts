@@ -24,7 +24,7 @@ export const getSingleAlert = async (args: any, req: any) => {
 
 export const createAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
-    const { url, targetPrice } = args.alertData;
+    const { url, targetPrice } = args;
 
     const alert = await AlertServices.createAlert({ url, targetPrice }, userId);
     console.log(`User ${chalk.blue(userId)} created alert for ${chalk.green(alert.product.title)}`);

@@ -1,11 +1,6 @@
 import { buildSchema } from 'graphql';
 
 export default buildSchema(`
-    input AlertData {
-        url: String
-        targetPrice: Float
-    }
-
     type Price {
         price: Float
         date: String
@@ -34,7 +29,7 @@ export default buildSchema(`
     }
 
     type RootMutation {
-        createAlert(alertData: AlertData!): Alert!
+        createAlert(url: String!, targetPrice: Float!): Alert!
         editAlert(id: ID!, newPrice: Float): Alert!
         deleteAlert(id: ID!): Alert!
     }
