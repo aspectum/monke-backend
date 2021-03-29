@@ -13,11 +13,14 @@ export default buildSchema(`
         imageUrl: String
         currency: String
         priceHistory: [Price]
+        lowestPrice: Price
     }
 
     type Alert {
         id: ID!
+        title: String
         targetPrice: Float
+        wasNotified: Boolean
         updatedAt: String
         createdAt: String
         product: Product
@@ -30,7 +33,7 @@ export default buildSchema(`
 
     type RootMutation {
         createAlert(url: String!, targetPrice: Float!): Alert!
-        editAlert(id: ID!, newPrice: Float): Alert!
+        editAlert(id: ID!, newTitle: String, newPrice: Float): Alert!
         deleteAlert(id: ID!): Alert!
     }
 

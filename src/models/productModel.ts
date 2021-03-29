@@ -35,6 +35,17 @@ const productSchema = new Schema<ProductDocument, ProductModel>({
             },
         },
     ],
+    lowestPrice: {
+        _id: false,
+        price: {
+            type: Number,
+            required: true,
+        },
+        date: {
+            type: Date,
+            default: Date.now,
+        },
+    },
 });
 
 export const Product = model<ProductDocument, ProductModel>('Product', productSchema);

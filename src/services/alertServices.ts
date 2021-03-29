@@ -47,6 +47,7 @@ export default class AlertServices {
             .then((product) => {
                 // Creating alert
                 const newAlert = new Alert({
+                    title: product.title,
                     product: product._id,
                     targetPrice,
                     user: Types.ObjectId(userId),
@@ -91,11 +92,12 @@ export default class AlertServices {
     }
 
     // Edits an alert
-    static editAlert(alertId: string, targetPrice: number, userId: string) {
+    static editAlert(alertId: string, title: string, targetPrice: number, userId: string) {
         return Alert.findById(alertId)
             .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
                 alert.targetPrice = targetPrice;
+                alert.title = title;
                 return alert.save();
             })
             .then((alert) => {

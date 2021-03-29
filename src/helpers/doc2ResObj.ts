@@ -18,14 +18,17 @@ const productFormatter = (productDoc: ProductDocument) => {
         imageUrl: productDoc.imageUrl,
         currency: productDoc.currency,
         priceHistory: productDoc.priceHistory,
+        lowestPrice: productDoc.lowestPrice,
     } as ProductObject;
 };
 
 export const alertFormatter = (alertDoc: Populated<AlertDocument, 'product'>) => {
     return {
         id: alertDoc._id.toString(),
+        title: alertDoc.title,
         product: productFormatter(alertDoc.product),
         targetPrice: alertDoc.targetPrice,
+        wasNotified: alertDoc.wasNotified,
         createdAt: alertDoc.createdAt.toISOString(),
         updatedAt: alertDoc.updatedAt.toISOString(),
     } as AlertObject;

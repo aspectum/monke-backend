@@ -23,6 +23,9 @@ export default class ProductServices {
                     price,
                 },
             ],
+            lowestPrice: {
+                price,
+            },
         });
 
         return newProd.save();

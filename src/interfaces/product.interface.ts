@@ -13,6 +13,7 @@ export interface ProductObject {
     imageUrl: string;
     currency: string;
     priceHistory: Array<Price>;
+    lowestPrice: Price;
 }
 
 // --------------- MONGOOSE INTERFACES --------------- //

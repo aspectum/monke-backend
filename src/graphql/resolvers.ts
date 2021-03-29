@@ -35,8 +35,9 @@ export const editAlert = async (args: any, req: any) => {
     const userId = req.authData.id;
     const alertId = args.id;
     const targetPrice = args.newPrice;
+    const title = args.newTitle;
 
-    const alert = await AlertServices.editAlert(alertId, targetPrice, userId);
+    const alert = await AlertServices.editAlert(alertId, title, targetPrice, userId);
     console.log(
         `User ${chalk.blue(userId)} changed ${chalk.green(alert.product.title)}'s target price`
     );
