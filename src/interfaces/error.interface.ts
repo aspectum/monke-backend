@@ -3,6 +3,8 @@ import { ObjectId } from '../types';
 
 export interface ErrorData {
     name: String;
+    message: String;
+    stack: String;
 }
 
 // Interface for mongoose Document

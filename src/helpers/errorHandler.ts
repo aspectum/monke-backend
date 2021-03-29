@@ -14,7 +14,15 @@ interface CustomMongoError extends MongoError {
     };
 }
 
-type PossibleErrors = Error | GraphQLError | CustomMongoError;
+// Accounting for customErrors
+interface OriginalError extends Error {
+    customError?: boolean;
+}
+interface CustomGQLError extends GraphQLError {
+    originalError: OriginalError;
+}
+
+type PossibleErrors = Error | CustomGQLError | CustomMongoError;
 
 type ErrorResponseObject = {
     name: string;
@@ -31,7 +39,7 @@ const errorLogger = (error: ErrorResponseObject, stack?: string) => {
 };
 
 // Parses the received error to standardize output format
-const errorParser = async (err: PossibleErrors) => {
+const errorParser = (err: PossibleErrors) => {
     const error: ErrorResponseObject = {
         name: err.name,
         message: err.message,
@@ -41,7 +49,9 @@ const errorParser = async (err: PossibleErrors) => {
     // If error was throw by graphql
     if ('originalError' in err && err.originalError) {
         error.name = err.originalError.name;
-        anticipatedError = true;
+        if (err.originalError.customError) {
+            anticipatedError = true;
+        }
     }
     // If error was thrown by mongoDB
     else if (err.name === 'MongoError' && 'code' in err) {
@@ -74,7 +84,11 @@ const errorParser = async (err: PossibleErrors) => {
         return error;
     }
 
-    await saveError(err);
+    // Saving unexpected error to DB for later
+    saveError({
+        ...error,
+        stack: err.stack as string,
+    });
 
     return {
         name: 'UnexpectedError',
