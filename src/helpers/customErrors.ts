@@ -15,7 +15,7 @@ export class AlertDoesNotExistError extends CustomError {
     alertId;
 
     constructor(alertId: string) {
-        super(`There is no alert id:${alertId}`);
+        super(`There is no alert id: ${alertId}`);
         this.name = 'AlertDoesNotExistError';
         this.alertId = alertId;
     }
@@ -26,7 +26,7 @@ export class AlertWrongUserError extends CustomError {
     userId;
 
     constructor(alertId: string, userId: string) {
-        super(`Alert id:${alertId} doesn't belong to user id:${userId}`);
+        super(`Alert id: ${alertId} doesn't belong to user id: ${userId}`);
         this.name = 'AlertWrongUserError';
         this.alertId = alertId;
         this.userId = userId;
@@ -47,7 +47,7 @@ export class UserWrongCredentialsError extends CustomError {
     email;
 
     constructor(email: string) {
-        super(`Incorrect credentials for user email:${email}`);
+        super(`Incorrect credentials for user email: ${email}`);
         this.name = 'UserWrongCredentialsError';
         this.email = email;
     }

@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import { GraphQLError } from 'graphql';
 import { MongoError } from 'mongodb';
+import { saveError } from '../services/errorServices';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
 // For some reason keyValue wasn't showing up in default MongoError
@@ -30,32 +31,55 @@ const errorLogger = (error: ErrorResponseObject, stack?: string) => {
 };
 
 // Parses the received error to standardize output format
-const errorParser = (err: PossibleErrors) => {
+const errorParser = async (err: PossibleErrors) => {
     const error: ErrorResponseObject = {
         name: err.name,
         message: err.message,
     };
+    let anticipatedError = false;
 
     // If error was throw by graphql
     if ('originalError' in err && err.originalError) {
         error.name = err.originalError.name;
+        anticipatedError = true;
     }
     // If error was thrown by mongoDB
     else if (err.name === 'MongoError' && 'code' in err) {
         if (err.code === 11000) {
             if (Object.keys(err.keyValue).includes('email')) {
-                error.name = 'EmailAlreadyExists';
+                error.name = 'EmailAlreadyExistsError';
                 error.message = `There is already a user with the email ${err.keyValue.email}`;
+                anticipatedError = true;
             }
             if (Object.keys(err.keyValue).includes('username')) {
-                error.name = 'UsernameAlreadyExists';
+                error.name = 'UsernameAlreadyExistsError';
                 error.message = `There is already a user with the username ${err.keyValue.username}`;
+                anticipatedError = true;
             }
         }
     }
+    // if error was thrown by jsonwebtoken
+    else if (err.name === 'TokenExpiredError') {
+        error.name = 'TokenExpiredError';
+        error.message = `Token expired, please log in again`;
+        anticipatedError = true;
+    } else if (err.name === 'JsonWebTokenError') {
+        error.name = 'JsonWebTokenError';
+        error.message = `Invalid Token`;
+        anticipatedError = true;
+    }
 
     errorLogger(error, err.stack);
-    return error;
+    if (anticipatedError) {
+        return error;
+    }
+
+    await saveError(err);
+
+    return {
+        name: 'UnexpectedError',
+        message: `An unexpected error occurred. We are working on solving it. Meanwhile, try that operation again.`,
+    };
 };
 
 // Express error handling middleware
