@@ -22,7 +22,7 @@ interface CustomGQLError extends GraphQLError {
     originalError: OriginalError;
 }
 
-type PossibleErrors = Error | CustomGQLError | CustomMongoError;
+type PossibleErrors = Error | CustomGQLError | CustomMongoError | OriginalError;
 
 type ErrorResponseObject = {
     name: string;
@@ -45,6 +45,11 @@ const errorParser = (err: PossibleErrors) => {
         message: err.message,
     };
     let anticipatedError = false;
+
+    // CustomError thrown by auth Express middleware
+    if ('customError' in err && err.customError) {
+        anticipatedError = true;
+    }
 
     // If error was throw by graphql
     if ('originalError' in err && err.originalError) {
