@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import { GraphQLError } from 'graphql';
 import { MongoError } from 'mongodb';
+import util from 'util';
 import { saveError } from '../services/errorServices';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
 
@@ -91,9 +92,11 @@ const errorParser = (err: PossibleErrors) => {
 
     // Saving unexpected error to DB for later
     saveError({
-        ...error,
-        stack: err.stack as string,
+        name: err.name,
+        errorSimple: util.inspect(err, false, null, true),
+        errorDetailed: util.inspect(err, true, null, true),
     });
+    console.log(`Unexpected error saved to DB ${chalk.red(err.name)}`);
 
     return {
         name: 'UnexpectedError',

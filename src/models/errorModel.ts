@@ -8,8 +8,12 @@ const errorSchema = new Schema<ErrorDocument, ErrorModel>(
             type: String,
             required: true,
         },
-        errorObj: {
-            type: Object,
+        errorSimple: {
+            type: String,
+            required: true,
+        },
+        errorDetailed: {
+            type: String,
             required: true,
         },
     },

@@ -1,10 +1,16 @@
-import { ErrorData } from '../interfaces';
 import { Error } from '../models/errorModel';
 
-export const saveError = (errorData: ErrorData) => {
+type SaveErrorArgs = {
+    name: string;
+    errorSimple: string;
+    errorDetailed: string;
+};
+
+export const saveError = ({ name, errorSimple, errorDetailed }: SaveErrorArgs) => {
     const newError = new Error({
-        name: errorData.name,
-        errorObj: errorData,
+        name,
+        errorSimple,
+        errorDetailed,
     });
 
     return newError.save();
