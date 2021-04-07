@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsnd --clear --respawn --transpile-only -r dotenv/config src/server.ts",
-    "push-branch": "git subtree push --prefix backend origin backend",
+    "push-branch": "cd .. && git subtree push --prefix backend origin backend",
     "docker-start": "docker-compose up -d",
     "docker-stop": "docker-compose down"
   },
