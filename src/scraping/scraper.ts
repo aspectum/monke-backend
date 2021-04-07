@@ -5,7 +5,7 @@ import { RawProductData } from '../interfaces';
 // Scrape amazon page for ebook data
 const scrape = async (amzUrl: string): Promise<RawProductData> => {
     // Setting up puppeteer
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
 
