@@ -9,6 +9,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "push-branch": "cd .. && git subtree push --prefix backend origin backend",
+    "deploy": "cd .. && git subtree push --prefix backend heroku master",
     "docker-start": "docker-compose up -d",
     "docker-stop": "docker-compose down"
   },
