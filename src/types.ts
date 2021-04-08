@@ -18,9 +18,3 @@ export interface ExpressReq extends Request {
 export interface ExpressRes extends Response {}
 
 export interface ExpressNext extends NextFunction {}
-
-// 3.Adding typesafety for Populate and Select in https://hackernoon.com/how-to-link-mongoose-and-typescript-for-a-single-source-of-truth-94o3uqc
-export type Populated<M, K extends keyof M> = Omit<M, K> &
-    {
-        [P in K]: Exclude<M[P], ObjectId[] | string>;
-    };

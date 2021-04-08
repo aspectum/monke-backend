@@ -1,14 +1,13 @@
 // Takes in a mongoose document and returns an object stripped down of mongoose properties and formatted to response
 
 import {
-    AlertDocument,
+    AlertDocumentPopulatedProduct,
     AlertObject,
     ProductDocument,
     ProductObject,
     UserDocument,
     UserObject,
 } from '../interfaces';
-import { Populated } from '../types';
 
 const productFormatter = (productDoc: ProductDocument) => {
     return {
@@ -22,7 +21,7 @@ const productFormatter = (productDoc: ProductDocument) => {
     } as ProductObject;
 };
 
-export const alertFormatter = (alertDoc: Populated<AlertDocument, 'product'>) => {
+export const alertFormatter = (alertDoc: AlertDocumentPopulatedProduct) => {
     return {
         id: alertDoc._id.toString(),
         title: alertDoc.title,

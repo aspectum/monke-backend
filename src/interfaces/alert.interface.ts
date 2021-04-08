@@ -1,6 +1,7 @@
 import { Document, Model } from 'mongoose';
 import { ObjectId } from '../types';
 import { ProductDocument, ProductObject } from './product.interface';
+import { UserDocument } from './user.interface';
 
 // What is sent by API
 export interface AlertObject {
@@ -21,9 +22,23 @@ export interface AlertDocument extends Document {
     product: string | ProductDocument; // if populated
     targetPrice: number;
     wasNotified: boolean;
-    user: ObjectId;
+    user: ObjectId | UserDocument;
     createdAt: Date;
     updatedAt: Date;
+}
+
+// Populated interfaces
+
+export interface AlertDocumentPopulatedProduct extends Omit<AlertDocument, 'product'> {
+    product: ProductDocument;
+}
+
+export interface AlertDocumentPopulatedUser extends Omit<AlertDocument, 'user'> {
+    user: UserDocument;
+}
+
+export interface AlertDocumentPopulatedAll extends Omit<AlertDocumentPopulatedProduct, 'user'> {
+    user: UserDocument;
 }
 
 // Interface for mongoose Model

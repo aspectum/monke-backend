@@ -25,5 +25,10 @@ export interface UserDocument extends Omit<UserObject, 'id'>, Document {
     removeAlert(alertId: ObjectId): Promise<UserDocument>;
 }
 
+// Populated interface
+export interface UserDocumentPopulatedAlerts extends Omit<UserDocument, 'alerts'> {
+    alerts: AlertDocument[];
+}
+
 // Interface for mongoose Model
 export interface UserModel extends Model<UserDocument> {}
