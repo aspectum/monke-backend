@@ -1,7 +1,9 @@
 import chalk from 'chalk';
 import { Types } from 'mongoose';
+import { mailer } from '../config/mailer';
 import { AlertDoesNotExistError, AlertWrongUserError } from '../helpers/customErrors';
 import { alertFormatter } from '../helpers/doc2ResObj';
+import { alertMail } from '../helpers/mailTemplates';
 import {
     AlertData,
     AlertDocument,
@@ -158,6 +160,13 @@ export default class AlertServices {
                     console.log(
                         `Alert for ${alert.product.title} for user ${alert.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
                     );
+
+                    return mailer.sendMail({
+                        to: alert.user.email,
+                        from: 'monke.amazon.price.monitor@gmail.com',
+                        subject: `monke: Price alert for ${alert.product.title}`,
+                        html: alertMail(alert),
+                    });
                 }
             });
     }
