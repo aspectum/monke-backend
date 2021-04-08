@@ -1,20 +1,26 @@
+import chalk from 'chalk';
 import { Types } from 'mongoose';
 import { AlertDoesNotExistError, AlertWrongUserError } from '../helpers/customErrors';
 import { alertFormatter } from '../helpers/doc2ResObj';
-import { AlertData, AlertDocument, ProductData, UserDocument } from '../interfaces';
+import {
+    AlertData,
+    AlertDocument,
+    AlertDocumentPopulatedAll,
+    AlertDocumentPopulatedProduct,
+    ProductData,
+    UserDocumentPopulatedAlerts,
+} from '../interfaces';
 import { Alert } from '../models/alertModel';
-import { Populated } from '../types';
+import { ObjectId } from '../types';
 import ProductServices from './productServices';
 import UserServices from './userServices';
-
-type PopulatedAlert = Populated<AlertDocument, 'product'>;
 
 // Checks if alert was found in DB and if so whether it belongs to the user requesting
 const validateAlert = (alert: AlertDocument | null, alertId: string, userId: string) => {
     // If query returned an alert
     if (alert) {
         // If alert belongs to requesting user
-        if (alert.user.equals(userId)) {
+        if ((alert.user as ObjectId).equals(userId)) {
             return alert;
         }
         throw new AlertWrongUserError(alertId, userId);
@@ -61,7 +67,9 @@ export default class AlertServices {
                 return UserServices.addAlert(alert._id, userId);
             }) // TODO: Check if added correctly?
             .then(() => {
-                return createdAlert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+                return createdAlert
+                    .populate('product')
+                    .execPopulate() as Promise<AlertDocumentPopulatedProduct>;
             })
             .then(alertFormatter);
     }
@@ -75,9 +83,9 @@ export default class AlertServices {
                         path: 'alerts',
                         populate: { path: 'product' },
                     })
-                    .execPopulate() as Promise<Populated<UserDocument, 'alerts'>>;
+                    .execPopulate() as Promise<UserDocumentPopulatedAlerts>;
             })
-            .then((populatedUser) => populatedUser.alerts as PopulatedAlert[])
+            .then((populatedUser) => populatedUser.alerts as AlertDocumentPopulatedProduct[])
             .then((populatedAlerts) => populatedAlerts.map(alertFormatter));
     }
 
@@ -86,7 +94,9 @@ export default class AlertServices {
         return Alert.findById(alertId)
             .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
-                return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+                return alert
+                    .populate('product')
+                    .execPopulate() as Promise<AlertDocumentPopulatedProduct>;
             })
             .then(alertFormatter);
     }
@@ -101,7 +111,9 @@ export default class AlertServices {
                 return alert.save();
             })
             .then((alert) => {
-                return alert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+                return alert
+                    .populate('product')
+                    .execPopulate() as Promise<AlertDocumentPopulatedProduct>;
             })
             .then(alertFormatter);
     }
@@ -122,8 +134,55 @@ export default class AlertServices {
                 return UserServices.removeAlert(deletedAlert._id, userId);
             })
             .then(() => {
-                return deletedAlert.populate('product').execPopulate() as Promise<PopulatedAlert>;
+                return deletedAlert
+                    .populate('product')
+                    .execPopulate() as Promise<AlertDocumentPopulatedProduct>;
             })
             .then(alertFormatter);
+    }
+
+    // Check if product price is below alert targetPrice
+    static checkNotifyUser(alert: AlertDocument) {
+        const targetPrice = alert.targetPrice;
+
+        return (alert.populate('product').execPopulate() as Promise<AlertDocumentPopulatedProduct>)
+            .then((alertWithProd) => {
+                return alertWithProd
+                    .populate('user')
+                    .execPopulate() as Promise<AlertDocumentPopulatedAll>;
+            })
+            .then((alert) => {
+                const recentPrice =
+                    alert.product.priceHistory[alert.product.priceHistory.length - 1].price;
+                if (recentPrice < targetPrice) {
+                    console.log(
+                        `Alert for ${alert.product.title} for user ${alert.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
+                    );
+                }
+            });
+    }
+
+    // Checks every alert if user should be notified
+    static checkAlerts() {
+        console.log(chalk.bgCyan('Updating product prices'));
+        const startTime = Date.now();
+        let len: number;
+        return Alert.find({})
+            .exec()
+            .then((alerts) => {
+                len = alerts.length;
+                return Promise.all(
+                    alerts.map((alert) => {
+                        return new Promise((resolve) => {
+                            resolve(this.checkNotifyUser(alert));
+                        });
+                    })
+                );
+            })
+            .then((values) => {
+                const timeDiff = Math.round((Date.now() - startTime) / 1000);
+                console.log(chalk.yellow(`Checked ${len} alerts in ${timeDiff} seconds`));
+                process.exit();
+            });
     }
 }
