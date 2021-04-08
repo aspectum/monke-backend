@@ -78,8 +78,9 @@ export default class ProductServices {
             .then((values) => {
                 const timeDiff = Math.round((Date.now() - startTime) / 1000);
                 console.log(
-                    chalk.bgGreen(`Updated the prices of ${len} products in ${timeDiff} seconds`)
+                    chalk.yellow(`Updated the prices of ${len} products in ${timeDiff} seconds`)
                 );
+                process.exit();
             });
     }
 }
