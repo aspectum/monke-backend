@@ -4,11 +4,21 @@ import { RawProductData } from '../interfaces';
 
 // Scrape amazon page for ebook data
 const scrape = async (amzUrl: string): Promise<RawProductData> => {
+    let browser = null;
+
     try {
         // Setting up puppeteer
-        const browser = await puppeteer.launch({
+        browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disabled-setupid-sandbox'],
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--proxy-server="direct://"',
+                '--proxy-bypass-list=*',
+                '--no-zygote',
+            ],
         });
         const page = await browser.newPage();
         await page.setViewport({ width: 1920, height: 1080 });
@@ -64,6 +74,10 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
         }
     } catch (err) {
         throw err;
+    } finally {
+        if (browser !== null) {
+            await browser.close();
+        }
     }
 };
 
