@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright-chromium';
 import { ScrapingError } from '../helpers/customErrors';
 import { RawProductData } from '../interfaces';
 
@@ -7,37 +7,22 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
     let browser = null;
 
     try {
-        // Setting up puppeteer
-        browser = await puppeteer.launch({
+        // Setting up playwright
+        browser = await chromium.launch({
             headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-gpu',
-                '--disable-dev-shm-usage',
-                '--proxy-server="direct://"',
-                '--proxy-bypass-list=*',
-                '--no-zygote',
-            ],
+            chromiumSandbox: false,
         });
         const page = await browser.newPage();
-        await page.setViewport({ width: 1920, height: 1080 });
 
         // Disabling images, css and custom fonts
-        await page.setRequestInterception(true);
-        page.on('request', (req) => {
-            if (
-                req.resourceType() === 'stylesheet' ||
-                req.resourceType() === 'font' ||
-                req.resourceType() === 'image'
-            ) {
-                req.abort();
-            } else {
-                req.continue();
+        page.route(
+            /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
+            (route) => {
+                route.abort();
             }
-        });
+        );
 
-        await page.goto(amzUrl);
+        await page.goto(amzUrl, { timeout: 60000 });
 
         try {
             const data = await page.evaluate(() => {
@@ -80,5 +65,7 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
         }
     }
 };
+
+// scrape('https://www.amazon.com.br/dp/B017OMXR7O/').then(console.log);
 
 export default scrape;
