@@ -15,7 +15,7 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
         const page = await browser.newPage();
 
         // Disabling images, css and custom fonts
-        page.route(
+        await page.route(
             /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
             (route) => {
                 route.abort();
