@@ -11,6 +11,7 @@ const scrape = async (amzUrl: string): Promise<RawProductData> => {
         browser = await chromium.launch({
             headless: true,
             chromiumSandbox: false,
+            args: ['--disable-gpu', '--no-sandbox'],
         });
         const page = await browser.newPage();
 
