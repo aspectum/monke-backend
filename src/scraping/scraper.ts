@@ -1,72 +1,111 @@
-import { chromium } from 'playwright-chromium';
+import { chromium, ChromiumBrowser, ChromiumBrowserContext } from 'playwright-chromium';
 import { ScrapingError } from '../helpers/customErrors';
 import { RawProductData } from '../interfaces';
 
-// Scrape amazon page for ebook data
-const scrape = async (amzUrl: string): Promise<RawProductData> => {
-    let browser = null;
+class Scraper {
+    browser: ChromiumBrowser | null;
+    context: ChromiumBrowserContext | null;
+    timeout!: NodeJS.Timeout;
 
-    try {
-        // Setting up playwright
-        browser = await chromium.launch({
-            headless: true,
-            chromiumSandbox: false,
-            args: ['--disable-gpu', '--no-sandbox'],
-        });
-        const page = await browser.newPage();
+    constructor() {
+        this.browser = null;
+        this.context = null;
+        this.refreshTimeout();
+    }
 
-        // Disabling images, css and custom fonts
-        await page.route(
-            /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
-            (route) => {
-                route.abort();
-            }
-        );
-
-        await page.goto(amzUrl, { timeout: 60000 });
-
+    // Setting up playwright
+    // Create new browser and context
+    async newBrowser() {
         try {
-            const data = await page.evaluate(() => {
-                const ASINElement = document.querySelector(
-                    'input[name^="ASIN"]'
-                ) as HTMLInputElement;
-                const urlElement = document.querySelector(
-                    'link[rel="canonical"]'
-                ) as HTMLLinkElement;
-                const titleElement = document.querySelector('span#productTitle') as HTMLSpanElement;
-                const imageElement = document.querySelector(
-                    'img.a-dynamic-image'
-                ) as HTMLImageElement;
-                // let price = document.querySelector('span.a-color-price').innerText;
-                const priceElement = document.querySelector(
-                    '.kindle-price span'
-                ) as HTMLSpanElement; // ebook only, but it's more reliable
-
-                return {
-                    ASIN: ASINElement.value,
-                    url: urlElement.href,
-                    title: titleElement.innerText,
-                    imageUrl: imageElement.src,
-                    price: priceElement.innerText,
-                };
+            this.browser = await chromium.launch({
+                headless: true,
+                chromiumSandbox: false,
+                args: ['--disable-gpu', '--no-sandbox'],
             });
 
-            await page.close();
-            await browser.close();
+            this.context = await this.browser.newContext();
 
-            return data;
+            // Disabling images, css and custom fonts
+            await this.context.route(
+                /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
+                (route) => {
+                    route.abort();
+                }
+            );
         } catch (err) {
-            throw new ScrapingError(amzUrl);
-        }
-    } catch (err) {
-        throw err;
-    } finally {
-        if (browser !== null) {
-            await browser.close();
+            throw err;
         }
     }
-};
 
-// scrape('https://www.amazon.com.br/dp/B017OMXR7O/').then(console.log);
+    // Close browser to release resources
+    async closeBrowser() {
+        if (this.browser !== null) {
+            await this.context!.close();
+            await this.browser.close();
+            this.browser = null;
+            this.context = null;
+        }
+    }
 
-export default scrape;
+    // Scrape amazon page for ebook data
+    async scrape(amzUrl: string): Promise<RawProductData> {
+        try {
+            // Refreshes timeout each scrape call
+            this.refreshTimeout();
+
+            if (this.browser === null) {
+                await this.newBrowser();
+            }
+
+            const page = await this.context!.newPage();
+
+            await page.goto(amzUrl, { timeout: 60000 });
+
+            try {
+                const data = await page.evaluate(() => {
+                    const ASINElement = document.querySelector(
+                        'input[name^="ASIN"]'
+                    ) as HTMLInputElement;
+                    const urlElement = document.querySelector(
+                        'link[rel="canonical"]'
+                    ) as HTMLLinkElement;
+                    const titleElement = document.querySelector(
+                        'span#productTitle'
+                    ) as HTMLSpanElement;
+                    const imageElement = document.querySelector(
+                        'img.a-dynamic-image'
+                    ) as HTMLImageElement;
+                    // let price = document.querySelector('span.a-color-price').innerText;
+                    const priceElement = document.querySelector(
+                        '.kindle-price span'
+                    ) as HTMLSpanElement; // ebook only, but it's more reliable
+
+                    return {
+                        ASIN: ASINElement.value,
+                        url: urlElement.href,
+                        title: titleElement.innerText,
+                        imageUrl: imageElement.src,
+                        price: priceElement.innerText,
+                    };
+                });
+
+                await page.close();
+
+                return data;
+            } catch (err) {
+                throw new ScrapingError(amzUrl);
+            }
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    refreshTimeout() {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+        }
+        this.timeout = setTimeout(this.closeBrowser, 120000); // Closes browser in 2 minutes
+    }
+}
+
+export const scraper = new Scraper();
