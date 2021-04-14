@@ -61,8 +61,9 @@ export default class ProductServices {
         console.log(chalk.bgCyan('Updating product prices'));
         const startTime = Date.now();
         let len: number;
-        return Product.find({})
-            .exec()
+        return scraper
+            .checkBrowser()
+            .then(() => Product.find({}).exec())
             .then((products) => {
                 len = products.length;
                 return Promise.all(
@@ -70,7 +71,7 @@ export default class ProductServices {
                         return new Promise((resolve) => {
                             setTimeout(() => {
                                 resolve(this.updatePriceHistory(prod));
-                            }, Math.floor(index / 5) * 15000); // Scrape a batch of 5 every 10 seconds
+                            }, Math.floor(index / 5) * 10000); // Scrape a batch of 5 every 10 seconds
                         });
                     })
                 );

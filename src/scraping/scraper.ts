@@ -15,23 +15,25 @@ class Scraper {
 
     // Setting up playwright
     // Create new browser and context
-    async newBrowser() {
+    async checkBrowser() {
         try {
-            this.browser = await chromium.launch({
-                headless: true,
-                chromiumSandbox: false,
-                args: ['--disable-gpu', '--no-sandbox'],
-            });
+            if (this.browser === null) {
+                this.browser = await chromium.launch({
+                    headless: true,
+                    chromiumSandbox: false,
+                    args: ['--disable-gpu', '--no-sandbox'],
+                });
 
-            this.context = await this.browser.newContext();
+                this.context = await this.browser.newContext();
 
-            // Disabling images, css and custom fonts
-            await this.context.route(
-                /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
-                (route) => {
-                    route.abort();
-                }
-            );
+                // Disabling images, css and custom fonts
+                await this.context.route(
+                    /(\.png$)|(\.jpg$)|(\.jpeg$)|(\.gif$)|(\.css$)|(\.woff$)|(\.woff2$)/,
+                    (route) => {
+                        route.abort();
+                    }
+                );
+            }
         } catch (err) {
             throw err;
         }
@@ -39,11 +41,13 @@ class Scraper {
 
     // Close browser to release resources
     async closeBrowser() {
+        if (this.context !== null) {
+            await this.context.close();
+            this.context = null;
+        }
         if (this.browser !== null) {
-            await this.context!.close();
             await this.browser.close();
             this.browser = null;
-            this.context = null;
         }
     }
 
@@ -53,9 +57,7 @@ class Scraper {
             // Refreshes timeout each scrape call
             this.refreshTimeout();
 
-            if (this.browser === null) {
-                await this.newBrowser();
-            }
+            await this.checkBrowser();
 
             const page = await this.context!.newPage();
 
