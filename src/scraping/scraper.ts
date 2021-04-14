@@ -1,10 +1,10 @@
-import { firefox, FirefoxBrowser, BrowserContext } from 'playwright-firefox';
+import { chromium, ChromiumBrowser, ChromiumBrowserContext } from 'playwright-chromium';
 import { ScrapingError } from '../helpers/customErrors';
 import { RawProductData } from '../interfaces';
 
 class Scraper {
-    browser: FirefoxBrowser | null;
-    context: BrowserContext | null;
+    browser: ChromiumBrowser | null;
+    context: ChromiumBrowserContext | null;
     timeout!: NodeJS.Timeout;
 
     constructor() {
@@ -18,8 +18,9 @@ class Scraper {
     async checkBrowser() {
         try {
             if (this.browser === null) {
-                this.browser = await firefox.launch({
+                this.browser = await chromium.launch({
                     headless: true,
+                    chromiumSandbox: false,
                     args: ['--disable-gpu', '--no-sandbox'],
                 });
 
