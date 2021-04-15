@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import scrapedDataParser from '../helpers/scrapedDataParser';
 import { ProductData, ProductDocument } from '../interfaces';
 import { Product } from '../models/productModel';
-import scrape from '../scraping/scraper';
+import { scraper } from '../scraping/scraper';
 
 // Defining product services
 export default class ProductServices {
@@ -34,7 +34,7 @@ export default class ProductServices {
 
     // Scraping and parsing url
     static scrapeUrl(url: string) {
-        return scrape(url).then(scrapedDataParser);
+        return scraper.scrape(url).then(scrapedDataParser);
     }
 
     // update priceHistory
@@ -61,8 +61,9 @@ export default class ProductServices {
         console.log(chalk.bgCyan('Updating product prices'));
         const startTime = Date.now();
         let len: number;
-        return Product.find({})
-            .exec()
+        return scraper
+            .checkBrowser()
+            .then(() => Product.find({}).exec())
             .then((products) => {
                 len = products.length;
                 return Promise.all(
@@ -80,7 +81,8 @@ export default class ProductServices {
                 console.log(
                     chalk.yellow(`Updated the prices of ${len} products in ${timeDiff} seconds`)
                 );
-                process.exit();
-            });
+                return scraper.closeBrowser();
+            })
+            .then(() => process.exit());
     }
 }
