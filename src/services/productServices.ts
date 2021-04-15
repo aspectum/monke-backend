@@ -1,8 +1,10 @@
 import chalk from 'chalk';
+import util from 'util';
 import scrapedDataParser from '../helpers/scrapedDataParser';
 import { ProductData, ProductDocument } from '../interfaces';
 import { Product } from '../models/productModel';
-import { scraper } from '../scraping/scraper';
+import scrape from '../scraping/scraper';
+import { saveError } from './errorServices';
 
 // Defining product services
 export default class ProductServices {
@@ -34,7 +36,7 @@ export default class ProductServices {
 
     // Scraping and parsing url
     static scrapeUrl(url: string) {
-        return scraper.scrape(url).then(scrapedDataParser);
+        return scrape(url).then(scrapedDataParser);
     }
 
     // update priceHistory
@@ -61,28 +63,48 @@ export default class ProductServices {
         console.log(chalk.bgCyan('Updating product prices'));
         const startTime = Date.now();
         let len: number;
-        return scraper
-            .checkBrowser()
-            .then(() => Product.find({}).exec())
+        return Product.find({})
+            .exec()
             .then((products) => {
                 len = products.length;
-                return Promise.all(
-                    products.map((prod, index) => {
-                        return new Promise((resolve) => {
-                            setTimeout(() => {
-                                resolve(this.updatePriceHistory(prod));
-                            }, Math.floor(index / 5) * 10000); // Scrape a batch of 5 every 10 seconds
-                        });
-                    })
-                );
+
+                let chain = (Promise.resolve() as unknown) as Promise<ProductDocument>;
+
+                products.forEach((prod) => {
+                    chain = chain
+                        .then(() => this.updatePriceHistory(prod))
+                        .catch((err) => {
+                            console.log(err);
+
+                            // Saving unexpected error to DB for later
+                            saveError({
+                                name: `UpdateAllProductsError: ${err.name}`,
+                                errorSimple: util.inspect(err, false, null, true),
+                                errorDetailed: util.inspect(err, true, null, true),
+                            });
+
+                            return prod;
+                        }); // Needs this catch so that a single error doesn't interrupt the whole chain
+                });
+
+                return chain;
             })
             .then((values) => {
                 const timeDiff = Math.round((Date.now() - startTime) / 1000);
                 console.log(
                     chalk.yellow(`Updated the prices of ${len} products in ${timeDiff} seconds`)
                 );
-                return scraper.closeBrowser();
+                process.exit();
             })
-            .then(() => process.exit());
+            .catch((err) => {
+                console.log(err);
+
+                // Saving unexpected error to DB for later
+                saveError({
+                    name: `UpdateAllProductsError: ${err.name}`,
+                    errorSimple: util.inspect(err, false, null, true),
+                    errorDetailed: util.inspect(err, true, null, true),
+                });
+            });
     }
 }
