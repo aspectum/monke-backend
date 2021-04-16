@@ -1,6 +1,35 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/lines-between-class-members */
-import { RawProductData } from '../interfaces';
+import { GraphQLError } from 'graphql';
+import { MongoError } from 'mongodb';
+import { ProductDocument, RawProductData } from '../interfaces';
+
+// ------------------------------------------
+// --------------- Typescript ---------------
+// ------------------------------------------
+
+// For some reason keyValue wasn't showing up in default MongoError
+interface CustomMongoError extends MongoError {
+    code: number;
+    keyValue: {
+        email?: string;
+        username?: string;
+    };
+}
+
+// Accounting for customErrors
+interface OriginalError extends Error {
+    customError?: boolean;
+}
+interface CustomGQLError extends GraphQLError {
+    originalError: OriginalError;
+}
+
+export type PossibleErrors = Error | CustomGQLError | CustomMongoError | OriginalError;
+
+// ---------------------------------------------
+// --------------- Custom Errors ---------------
+// ---------------------------------------------
 
 class CustomError extends Error {
     customError;
@@ -77,5 +106,15 @@ export class NoAuthorizationHeaderError extends CustomError {
     constructor() {
         super(`No authorization header`);
         this.name = 'NoAuthorizationHeaderError';
+    }
+}
+
+export class UpdateAllProductsError extends CustomError {
+    failures;
+
+    constructor(failures: ProductDocument[]) {
+        super(`Failed to update all products`);
+        this.name = 'UpdateAllProductsError';
+        this.failures = failures;
     }
 }

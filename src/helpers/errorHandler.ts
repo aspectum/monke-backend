@@ -1,29 +1,8 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
-import { GraphQLError } from 'graphql';
-import { MongoError } from 'mongodb';
-import util from 'util';
 import { saveError } from '../services/errorServices';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
-
-// For some reason keyValue wasn't showing up in default MongoError
-interface CustomMongoError extends MongoError {
-    code: number;
-    keyValue: {
-        email?: string;
-        username?: string;
-    };
-}
-
-// Accounting for customErrors
-interface OriginalError extends Error {
-    customError?: boolean;
-}
-interface CustomGQLError extends GraphQLError {
-    originalError: OriginalError;
-}
-
-type PossibleErrors = Error | CustomGQLError | CustomMongoError | OriginalError;
+import { PossibleErrors } from './customErrors';
 
 type ErrorResponseObject = {
     name: string;
@@ -91,11 +70,7 @@ const errorParser = (err: PossibleErrors) => {
     }
 
     // Saving unexpected error to DB for later
-    saveError({
-        name: err.name,
-        errorSimple: util.inspect(err, false, null, true),
-        errorDetailed: util.inspect(err, true, null, true),
-    });
+    saveError(err);
     console.log(`Unexpected error saved to DB ${chalk.red(err.name)}`);
 
     return {
