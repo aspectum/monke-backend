@@ -84,11 +84,13 @@ export class UserWrongCredentialsError extends CustomError {
 
 export class ScrapingError extends CustomError {
     url;
+    err;
 
-    constructor(url: string) {
+    constructor(url: string, err: Error) {
         super(`Could not scrape url ${url}`);
         this.name = 'ScrapingError';
         this.url = url;
+        this.err = err;
     }
 }
 
