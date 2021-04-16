@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { TimeoutError } from 'puppeteer';
 import { ScrapingError } from '../helpers/customErrors';
 import { RawProductData } from '../interfaces';
 
@@ -40,18 +40,28 @@ class Scraper {
 
     // Close browser to release resources
     async closeBrowser() {
-        if (this.context !== null) {
-            await this.context.close();
-            this.context = null;
-        }
-        if (this.browser !== null) {
-            await this.browser.close();
-            this.browser = null;
+        try {
+            if (this.context === undefined) {
+                this.context = null;
+            }
+            if (this.browser === undefined) {
+                this.browser = null;
+            }
+            if (this.context !== null) {
+                await this.context.close();
+                this.context = null;
+            }
+            if (this.browser !== null) {
+                await this.browser.close();
+                this.browser = null;
+            }
+        } catch (err) {
+            throw err;
         }
     }
 
     // Scrape amazon page for ebook data
-    async scrape(amzUrl: string): Promise<RawProductData> {
+    async scrape(amzUrl: string): Promise<RawProductData | null> {
         try {
             // Refreshes timeout each scrape call
             this.refreshTimeout();
@@ -108,9 +118,14 @@ class Scraper {
 
                 return data;
             } catch (err) {
-                throw new ScrapingError(amzUrl);
+                throw new ScrapingError(amzUrl, err);
             }
         } catch (err) {
+            // For now only trying again if it times out
+            /* instanceof not working */
+            if (err.name === 'TimeoutError') {
+                return null;
+            }
             throw err;
         }
     }

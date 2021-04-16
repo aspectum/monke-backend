@@ -1,7 +1,11 @@
 import chalk from 'chalk';
 import { Types } from 'mongoose';
 import { mailer } from '../config/mailer';
-import { AlertDoesNotExistError, AlertWrongUserError } from '../helpers/customErrors';
+import {
+    AlertDoesNotExistError,
+    AlertWrongUserError,
+    ScrapingError,
+} from '../helpers/customErrors';
 import { alertFormatter } from '../helpers/doc2ResObj';
 import { alertMail } from '../helpers/mailTemplates';
 import {
@@ -40,6 +44,13 @@ export default class AlertServices {
 
         return ProductServices.scrapeUrl(url)
             .then((data) => {
+                if (data === null) {
+                    const err = new Error() as any;
+                    err.name = 'DataIsNullError'; // hack
+                    err.url = url;
+                    throw err;
+                }
+
                 productData = data;
 
                 return ProductServices.findProductByASIN(productData.ASIN);
@@ -188,7 +199,7 @@ export default class AlertServices {
                     })
                 );
             })
-            .then((values) => {
+            .then(() => {
                 const timeDiff = Math.round((Date.now() - startTime) / 1000);
                 console.log(chalk.yellow(`Checked ${len} alerts in ${timeDiff} seconds`));
                 process.exit();
