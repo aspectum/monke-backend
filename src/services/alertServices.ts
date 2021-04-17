@@ -184,7 +184,7 @@ export default class AlertServices {
 
     // Checks every alert if user should be notified
     static checkAlerts() {
-        console.log(chalk.bgCyan('Updating product prices'));
+        console.log(chalk.bgCyan('Checking alerts'));
         const startTime = Date.now();
         let len: number;
         return Alert.find({})
