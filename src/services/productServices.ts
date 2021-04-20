@@ -125,6 +125,11 @@ export default class ProductServices {
             .exec()
             .then((products) => {
                 len = products.length;
+
+                setTimeout(() => {
+                    process.exit();
+                }, len * 12000); // to prevent task from hanging. Timeout proportional to number of products
+
                 return this.updateTheseProducts(products, 1);
             })
             .then((failures) => {
