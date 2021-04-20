@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import { model, Schema } from 'mongoose';
 import { UserDocument, UserModel } from '../interfaces';
 import { ObjectId } from '../types';

@@ -1,3 +1,4 @@
+/* eslint-disable no-process-exit */ // It will be run as a scheduled task in heroku, needs to exit
 import chalk from 'chalk';
 import { UpdateAllProductsError } from '../helpers/customErrors';
 import scrapedDataParser from '../helpers/scrapedDataParser';

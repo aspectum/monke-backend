@@ -2,7 +2,7 @@ import { AlertDocumentPopulatedAll } from '../interfaces';
 import { normalizeCurrency } from './normalizeCurrency';
 
 export const alertMail = (alert: AlertDocumentPopulatedAll) => {
-    const title = alert.product.title;
+    const { title } = alert.product;
     const img = alert.product.imageUrl;
     const targetPrice = normalizeCurrency(alert.targetPrice, alert.product.currency).formatted;
     const currentPrice = normalizeCurrency(

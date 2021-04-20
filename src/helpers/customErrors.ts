@@ -1,7 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 import { GraphQLError } from 'graphql';
-import { MongoError } from 'mongodb';
 import { ProductDocument, RawProductData } from '../interfaces';
 
 // ------------------------------------------
@@ -9,7 +8,7 @@ import { ProductDocument, RawProductData } from '../interfaces';
 // ------------------------------------------
 
 // For some reason keyValue wasn't showing up in default MongoError
-interface CustomMongoError extends MongoError {
+interface CustomMongoError extends Error {
     code: number;
     keyValue: {
         email?: string;

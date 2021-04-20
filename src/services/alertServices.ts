@@ -1,11 +1,8 @@
+/* eslint-disable no-process-exit */ // It will be run as a scheduled task in heroku, needs to exit
 import chalk from 'chalk';
 import { Types } from 'mongoose';
 import { mailer } from '../config/mailer';
-import {
-    AlertDoesNotExistError,
-    AlertWrongUserError,
-    ScrapingError,
-} from '../helpers/customErrors';
+import { AlertDoesNotExistError, AlertWrongUserError } from '../helpers/customErrors';
 import { alertFormatter } from '../helpers/doc2ResObj';
 import { alertMail } from '../helpers/mailTemplates';
 import {
@@ -156,7 +153,7 @@ export default class AlertServices {
 
     // Check if product price is below alert targetPrice
     static checkNotifyUser(alert: AlertDocument) {
-        const targetPrice = alert.targetPrice;
+        const { targetPrice } = alert;
 
         return (alert.populate('product').execPopulate() as Promise<AlertDocumentPopulatedProduct>)
             .then((alertWithProd) => {
@@ -164,21 +161,22 @@ export default class AlertServices {
                     .populate('user')
                     .execPopulate() as Promise<AlertDocumentPopulatedAll>;
             })
-            .then((alert) => {
+            .then((alertPop) => {
                 const recentPrice =
-                    alert.product.priceHistory[alert.product.priceHistory.length - 1].price;
+                    alertPop.product.priceHistory[alertPop.product.priceHistory.length - 1].price;
                 if (recentPrice < targetPrice) {
                     console.log(
-                        `Alert for ${alert.product.title} for user ${alert.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
+                        `Alert for ${alertPop.product.title} for user ${alertPop.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
                     );
 
                     return mailer.sendMail({
-                        to: alert.user.email,
+                        to: alertPop.user.email,
                         from: 'monke.amazon.price.monitor@gmail.com',
-                        subject: `monke: Price alert for ${alert.product.title}`,
-                        html: alertMail(alert),
+                        subject: `monke: Price alert for ${alertPop.product.title}`,
+                        html: alertMail(alertPop),
                     });
                 }
+                return null;
             });
     }
 

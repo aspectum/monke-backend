@@ -1,4 +1,5 @@
-import puppeteer, { TimeoutError } from 'puppeteer';
+/* eslint-disable @typescript-eslint/lines-between-class-members */
+import puppeteer from 'puppeteer';
 import { ScrapingError } from '../helpers/customErrors';
 import { RawProductData } from '../interfaces';
 
@@ -16,47 +17,39 @@ class Scraper {
     // Setting up playwright
     // Create new browser and context
     async checkBrowser() {
-        try {
-            if (this.browser === null) {
-                this.browser = await puppeteer.launch({
-                    headless: true,
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-gpu',
-                        '--disable-dev-shm-usage',
-                        '--proxy-server="direct://"',
-                        '--proxy-bypass-list=*',
-                        '--no-zygote',
-                    ],
-                });
+        if (this.browser === null) {
+            this.browser = await puppeteer.launch({
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-gpu',
+                    '--disable-dev-shm-usage',
+                    '--proxy-server="direct://"',
+                    '--proxy-bypass-list=*',
+                    '--no-zygote',
+                ],
+            });
 
-                this.context = await this.browser.createIncognitoBrowserContext();
-            }
-        } catch (err) {
-            throw err;
+            this.context = await this.browser.createIncognitoBrowserContext();
         }
     }
 
     // Close browser to release resources
     async closeBrowser() {
-        try {
-            if (this.context === undefined) {
-                this.context = null;
-            }
-            if (this.browser === undefined) {
-                this.browser = null;
-            }
-            if (this.context !== null) {
-                await this.context.close();
-                this.context = null;
-            }
-            if (this.browser !== null) {
-                await this.browser.close();
-                this.browser = null;
-            }
-        } catch (err) {
-            throw err;
+        if (this.context === undefined) {
+            this.context = null;
+        }
+        if (this.browser === undefined) {
+            this.browser = null;
+        }
+        if (this.context !== null) {
+            await this.context.close();
+            this.context = null;
+        }
+        if (this.browser !== null) {
+            await this.browser.close();
+            this.browser = null;
         }
     }
 
