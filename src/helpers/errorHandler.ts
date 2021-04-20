@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import chalk from 'chalk';
 import { saveError } from '../services/errorServices';
 import { ExpressNext, ExpressReq, ExpressRes } from '../types';
@@ -10,12 +9,21 @@ type ErrorResponseObject = {
 };
 
 // Console logs the error
-const errorLogger = (error: ErrorResponseObject, stack?: string) => {
-    console.log('---------NEW ERROR----------');
-    console.log(chalk.bgRed(error.name));
-    console.log(chalk.bgRed(error.message));
-    console.log(chalk.bgRed(stack));
-    // console.log(Object.getOwnPropertyNames(error));
+const errorLogger = (
+    error: ErrorResponseObject,
+    stack: string | undefined,
+    anticipatedError: boolean
+) => {
+    if (
+        anticipatedError === false ||
+        (anticipatedError === true && process.env.MONKE_DEBUG === 'true')
+    ) {
+        console.log('---------NEW ERROR----------');
+        console.log(chalk.bgRed(error.name));
+        console.log(chalk.bgRed(error.message));
+        console.log(chalk.bgRed(stack));
+        // console.log(Object.getOwnPropertyNames(error));
+    }
 };
 
 // Parses the received error to standardize output format
@@ -64,7 +72,7 @@ const errorParser = (err: PossibleErrors) => {
         anticipatedError = true;
     }
 
-    errorLogger(error, err.stack);
+    errorLogger(error, err.stack, anticipatedError);
     if (anticipatedError) {
         return error;
     }
