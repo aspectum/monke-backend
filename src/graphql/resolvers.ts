@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import chalk from 'chalk';
 import AlertServices from '../services/alertServices';
 
@@ -9,7 +8,9 @@ export const getAlerts = async (args: any, req: any) => {
     const userId = req.authData.id;
 
     const alerts = await AlertServices.listUserAlerts(userId);
-    console.log(`User ${chalk.blue(userId)} listed alerts`);
+    if (process.env.MONKE_DEBUG === 'true') {
+        console.log(`User ${chalk.blue(userId)} listed alerts`);
+    }
     return alerts;
 };
 
@@ -18,7 +19,11 @@ export const getSingleAlert = async (args: any, req: any) => {
     const alertId = args.id;
 
     const alert = await AlertServices.findById(alertId, userId);
-    console.log(`User ${chalk.blue(userId)} listed alert for ${chalk.green(alert.product.title)}`);
+    if (process.env.MONKE_DEBUG === 'true') {
+        console.log(
+            `User ${chalk.blue(userId)} listed alert for ${chalk.green(alert.product.title)}`
+        );
+    }
     return alert;
 };
 
@@ -27,7 +32,11 @@ export const createAlert = async (args: any, req: any) => {
     const { url, targetPrice } = args;
 
     const alert = await AlertServices.createAlert({ url, targetPrice }, userId);
-    console.log(`User ${chalk.blue(userId)} created alert for ${chalk.green(alert.product.title)}`);
+    if (process.env.MONKE_DEBUG === 'true') {
+        console.log(
+            `User ${chalk.blue(userId)} created alert for ${chalk.green(alert.product.title)}`
+        );
+    }
     return alert;
 };
 
@@ -38,7 +47,11 @@ export const editAlert = async (args: any, req: any) => {
     const title = args.newTitle;
 
     const alert = await AlertServices.editAlert(alertId, title, targetPrice, userId);
-    console.log(`User ${chalk.blue(userId)} edited alert for ${chalk.green(alert.product.title)}`);
+    if (process.env.MONKE_DEBUG === 'true') {
+        console.log(
+            `User ${chalk.blue(userId)} edited alert for ${chalk.green(alert.product.title)}`
+        );
+    }
     return alert;
 };
 
@@ -47,8 +60,10 @@ export const deleteAlert = async (args: any, req: any) => {
     const alertId = args.id;
 
     const alert = await AlertServices.deleteAlert(alertId, userId);
-    console.log(
-        `User ${chalk.blue(userId)} deleted the alert for ${chalk.red(alert.product.title)}`
-    );
+    if (process.env.MONKE_DEBUG === 'true') {
+        console.log(
+            `User ${chalk.blue(userId)} deleted the alert for ${chalk.red(alert.product.title)}`
+        );
+    }
     return alert;
 };

@@ -165,9 +165,11 @@ export default class AlertServices {
                 const recentPrice =
                     alertPop.product.priceHistory[alertPop.product.priceHistory.length - 1].price;
                 if (recentPrice < targetPrice) {
-                    console.log(
-                        `Alert for ${alertPop.product.title} for user ${alertPop.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
-                    );
+                    if (process.env.MONKE_DEBUG === 'true') {
+                        console.log(
+                            `Alert for ${alertPop.product.title} for user ${alertPop.user.username} fired. Target price was ${targetPrice} and found price was ${recentPrice}`
+                        );
+                    }
 
                     return mailer.sendMail({
                         to: alertPop.user.email,

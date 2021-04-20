@@ -57,7 +57,9 @@ export default class ProductServices {
                     return null;
                 }
 
-                console.log(`Updating price for ${chalk.green(product.title)}`); // TODO: remove
+                if (process.env.MONKE_DEBUG === 'true') {
+                    console.log(`Updating price for ${chalk.green(product.title)}`); // TODO: remove
+                }
                 const date = new Date();
                 product.priceHistory.push({
                     price: data.price,
