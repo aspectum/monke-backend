@@ -162,6 +162,3 @@ build/
 database
 
 notes.txt
-
-.eslintrc*
-.prettierrc
