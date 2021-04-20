@@ -7,7 +7,7 @@
     "dev": "tsnd --clear --respawn --transpile-only -r dotenv/config src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "deploy": "cd .. && git subtree push --prefix backend heroku master",
+    "deploy": "git push heroku master",
     "docker-start": "docker-compose up -d",
     "docker-stop": "docker-compose down"
   },
