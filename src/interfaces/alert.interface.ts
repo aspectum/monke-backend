@@ -1,7 +1,9 @@
 import { Document, Model } from 'mongoose';
 import { ObjectId } from '../types';
 import { ProductDocument, ProductObject } from './product.interface';
-import { UserDocument } from './user.interface';
+// I'm pretty sure it's fixed, but eslint still complains, so...
+// eslint-disable-next-line import/no-cycle
+import { UserDocumentWithoutAlerts } from './user.interface';
 
 // What is sent by API
 export interface AlertObject {
@@ -14,17 +16,21 @@ export interface AlertObject {
     updatedAt: string;
 }
 
-// Interface for mongoose Document
+// To avoid dependency cycle
 // (Too different to extend AlertObject)
-export interface AlertDocument extends Document {
+export interface AlertDocumentWithoutUser extends Document {
     _id: ObjectId;
     title: string;
     product: string | ProductDocument; // if populated
     targetPrice: number;
     wasNotified: boolean;
-    user: ObjectId | UserDocument;
     createdAt: Date;
     updatedAt: Date;
+}
+
+// Interface for mongoose Document
+export interface AlertDocument extends AlertDocumentWithoutUser {
+    user: ObjectId | UserDocumentWithoutAlerts;
 }
 
 // Populated interfaces
@@ -34,11 +40,11 @@ export interface AlertDocumentPopulatedProduct extends Omit<AlertDocument, 'prod
 }
 
 export interface AlertDocumentPopulatedUser extends Omit<AlertDocument, 'user'> {
-    user: UserDocument;
+    user: UserDocumentWithoutAlerts;
 }
 
 export interface AlertDocumentPopulatedAll extends Omit<AlertDocumentPopulatedProduct, 'user'> {
-    user: UserDocument;
+    user: UserDocumentWithoutAlerts;
 }
 
 // Interface for mongoose Model

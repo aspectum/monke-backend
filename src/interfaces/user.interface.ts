@@ -1,6 +1,8 @@
 import { Document, Model } from 'mongoose';
 import { ObjectId } from '../types';
-import { AlertDocument } from './alert.interface';
+// I'm pretty sure it's fixed, but eslint still complains, so...
+// eslint-disable-next-line import/no-cycle
+import { AlertDocumentWithoutUser } from './alert.interface';
 
 // What is sent by API
 export interface UserObject {
@@ -14,20 +16,24 @@ export interface RegisterData extends Omit<UserObject, 'id'> {
     password: string;
 }
 
-// --------------- MONGOOSE INTERFACES --------------- //
-// Interface for mongoose Document
-export interface UserDocument extends Omit<UserObject, 'id'>, Document {
+// To avoid dependency cycle
+export interface UserDocumentWithoutAlerts extends Omit<UserObject, 'id'>, Document {
     _id: ObjectId;
     encryptedPassword: string;
-    alerts: ObjectId[] | AlertDocument[]; // if populated
     activated: boolean;
     addAlert(alertId: ObjectId): Promise<UserDocument>;
     removeAlert(alertId: ObjectId): Promise<UserDocument>;
 }
 
+// --------------- MONGOOSE INTERFACES --------------- //
+// Interface for mongoose Document
+export interface UserDocument extends UserDocumentWithoutAlerts {
+    alerts: ObjectId[] | AlertDocumentWithoutUser[]; // if populated
+}
+
 // Populated interface
 export interface UserDocumentPopulatedAlerts extends Omit<UserDocument, 'alerts'> {
-    alerts: AlertDocument[];
+    alerts: AlertDocumentWithoutUser[];
 }
 
 // Interface for mongoose Model
