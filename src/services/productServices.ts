@@ -64,10 +64,12 @@ export default class ProductServices {
                     date,
                 });
                 if (data.price < product.lowestPrice.price) {
-                    product.lowestPrice = {
-                        price: data.price,
-                        date,
-                    };
+                    product.set({
+                        lowestPrice: {
+                            price: data.price,
+                            date,
+                        },
+                    });
                 }
                 return product.save();
             })

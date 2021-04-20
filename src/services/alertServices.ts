@@ -116,8 +116,8 @@ export default class AlertServices {
         return Alert.findById(alertId)
             .then((alert) => validateAlert(alert, alertId, userId))
             .then((alert) => {
-                alert.targetPrice = targetPrice;
-                alert.title = title;
+                alert.set({ targetPrice });
+                alert.set({ title });
                 return alert.save();
             })
             .then((alert) => {
