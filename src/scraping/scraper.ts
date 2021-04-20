@@ -116,10 +116,8 @@ class Scraper {
         } catch (err) {
             // For now only trying again if it times out
             /* instanceof not working */
-            if (err.name === 'TimeoutError') {
-                return null;
-            }
-            throw err;
+            console.log(err);
+            return null;
         }
     }
 
