@@ -114,8 +114,11 @@ class Scraper {
                 throw new ScrapingError(amzUrl, err);
             }
         } catch (err) {
-            // For now only trying again if it times out
-            /* instanceof not working */
+            if (err instanceof ScrapingError) {
+                // Let it be dealt with later
+                throw err;
+            }
+
             console.log(err);
             return null;
         }
