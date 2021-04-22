@@ -86,7 +86,7 @@ export class ScrapingError extends CustomError {
     err;
 
     constructor(url: string, err: Error) {
-        super(`Could not scrape url ${url}`);
+        super(`Could not scrape url ${url}. Are you sure it's a valid Amazon Kindle Store url?`);
         this.name = 'ScrapingError';
         this.url = url;
         this.err = err;
